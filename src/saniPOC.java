@@ -14,16 +14,14 @@ public class saniPOC {
 	private float[][] tuTg = new float[8][50];
 	private float[][] tTg = new float[8][50];
 
-	public static void main(String[] args) {
-		saniPOC sani = new saniPOC();
+	public void saniCalculation() {
+		loadArrays();
+		input();
 		
-		sani.loadArrays();
-		sani.input();
-		
-        if (sani.verifyInput()){
-        	System.out.println("starting sani calculation with Tu = " + sani.tu + ", Tg = " + sani.tg);
-        	sani.n = sani.calculateN();
-        	System.out.println("\tN is " + sani.n);
+        if (verifyInput()){
+        	System.out.println("starting sani calculation with Tu = " + tu + ", Tg = " + tg);
+        	n = calculateN();
+        	System.out.println("\tN is " + n);
         }
 
 	}

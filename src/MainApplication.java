@@ -1,5 +1,10 @@
 
-import java.util.*;
+import javax.swing.JFrame;
+import javax.swing.JRootPane;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+
+import org.apache.commons.math3.*; //TODO Reduce Import to include only the needed packages (streamlining)
 
 /**
  * 
@@ -23,9 +28,12 @@ public class MainApplication extends JFrame {
      * @param args 
      * @return
      */
-    public void main(String[] args) {
+    public static void main(String[] args) {
         // TODO implement here
-        return null;
+        System.out.println("Hallo Welt");
+        
+        saniPOC saniResult = new saniPOC();
+        saniResult.saniCalculation();
     }
 
 }
