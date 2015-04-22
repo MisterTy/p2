@@ -4,5 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/commons-math3-3.4.1-javadoc.jar"/>
 	<classpathentry kind="lib" path="lib/commons-math3-3.4.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JCommon 1.0.23"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JFreeChart 1.0.19"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
