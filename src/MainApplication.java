@@ -7,6 +7,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.apache.commons.math3.*; //TODO Reduce Import to include only the needed packages (streamlining)
+import org.apache.commons.math3.complex.Complex;
 
 
 /**
@@ -56,6 +57,11 @@ public class MainApplication extends JFrame {
      			}
      		});
         
+
+        double hallo[]={10,9,8,7,6,5,4,3,2,1,0};
+        double wert =3;
+
+        System.out.println("Test int_ver: "+MathLibrary.int_ver(hallo,wert)[0]+", "+MathLibrary.int_ver(hallo,wert)[1]);
         
         saniPOC saniResult = new saniPOC();
         saniResult.saniCalculation();
