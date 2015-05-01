@@ -32,22 +32,28 @@ public class MathLibrary {
     }
     
     
-    public static int[] linspace(int start,int end,int n){
-		return null;
+    public static double[] linspace(int start,int end,int n){
+    	double space[] =new double[n];    	
+    	for(double i = 0;i<n;i++) space[(int)i]=start+i*(end-start)/(n-1);
+   		return space;   	
+    }
+    
+    public static double[] linspace(int start,int end){
+    	double space[] =new double[100];    	
+    	for(double i = 0;i<100;i++) space[(int)i]=start+i*(end-start)/(99);
+		return space;
     	
     }
-    public static int[] linspace(int start,int end){
-    	int n=100;
-		return null;
-    	
+    public static double[] logspace(int start,int end,int n){
+    	double[] space=linspace(start,end,n);
+    	for (int i = 0; i < n; i++) space[i]=Math.pow(10, space[i]);
+		return space;    	
     }
-    public static int[] logspace(int start,int end,int n){
-		return null;
-    	
-    }
-    public static int[] logspace(int start,int end){
-    	int n=100;
-		return null;
+    
+    public static double[] logspace(int start,int end){
+    	double[] space=linspace(start,end,100);
+    	for (int i = 0; i < 100; i++) space[i]=Math.pow(10, space[i]);
+		return space;
     	
     }
 
