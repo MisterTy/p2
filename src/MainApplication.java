@@ -57,17 +57,25 @@ public class MainApplication extends JFrame {
      			}
      		});
 
-        //test logspace, int_ver
-/*        double a[]=new double[100];
+ //*****************test logspace, int_ver************************************************
+  /*      double a[]=new double[100];
         a=MathLibrary.logspace(0,4,10);
         for (int i = 0; i < a.length; i++) {
 			System.out.println(""+(i+1)+": "+a[i]);
 		}       
         double hallo[]={10,9,8,7,6,5,4,3,2,1,0};
-        double wert =7.7;
+        double wert =4.7;
 
         System.out.println("Test int_ver: "+hallo[MathLibrary.int_ver(hallo,wert)[0]]+", "+hallo[MathLibrary.int_ver(hallo,wert)[1]]);
+        
+        
+        Complex[] hallo1 = null;
+        double[] hallo2=null;
+        PIRegler reg=new PIRegler(hallo1, hallo2, 3, 3, 3);
+        double hallo3= reg.Tn;
         */
+        
+        
         saniPOC saniResult = new saniPOC();
         saniResult.saniCalculation();
     }
