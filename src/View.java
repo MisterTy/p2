@@ -48,7 +48,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 
 
-public class View extends JPanel {
+public class View extends JPanel implements Observer, ActionListener {
 
 	private JPanel 	panel1=new JPanel();
 	private JPanel 	panel2=new JPanel();
@@ -285,6 +285,14 @@ public class View extends JPanel {
 		
 		
 		
+		
+	}
+
+
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
 		
 	}
 }

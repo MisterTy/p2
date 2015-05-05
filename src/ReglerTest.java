@@ -18,11 +18,11 @@ public class ReglerTest extends JFrame{
 
 	public static void main(String[] args) {
 		double[] antwort=null;
-		
+
 		FaustformelRegler ffr=new FaustformelRegler();
-		ffr.Oppelt(0, 0, 0, "blaa");
 		
-    	System.out.println("PIReglertest");
+		
+    	System.out.println(Arrays.toString(ffr.Oppelt(30, 20, 0.5,Model.pidRegler)));
     	
     	
        	antwort=Phasengangmethode(MathLibrary.logspace(Math.log10(1/(Tmax*10)),Math.log10(1/(Tmin/10)),anzahlPunkte),ks,Math.PI/4);
