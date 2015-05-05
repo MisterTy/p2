@@ -49,7 +49,7 @@ public class ReglerTest extends JFrame{
 		
 		PIRegler piRegler=new PIRegler(Gs, w, phir, ks, T);
 		piRegler.compute();
-		piRegler.konsoleOut();
+		System.out.println(Arrays.toString(piRegler.getResult()));
 		return ans;
 		
 	}

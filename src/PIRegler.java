@@ -123,6 +123,11 @@ public class PIRegler extends GenericRegler {
     	berechnungStrecke();
     	berechnungOffenerRegelkreis();
     	
+    	System.out.println("rückgabe");
+    	result[0] = kR;
+    	result[1] = tn;
+    	result[2] = tv;
+    	result[3] = tp;
     }
     
     /**
