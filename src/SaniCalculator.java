@@ -11,26 +11,34 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class SaniCalculator {
-	private int tu = -1;
-	private int tg = -1;
+	
+	int n = -1;
+	double[] t;
 	
 	private double[][] tuTg = new double[8][50];
 	private double[][] tTg = new double[8][50];
 
-	public void saniCalculation() {
+	public void saniCalculation(double tu, double tg) {
 		loadArrays();
-		input();
 		
-        if (verifyInput()){
+        if (verifyInput(tu, tg)){
         	System.out.println("starting sani calculation with Tu = " + tu + ", Tg = " + tg);
         	double v = calculateV(tu, tg);
-        	int n = calculateN(v);
-        	double[] t = splineInterpolation(tg, n, v);
+        	n = calculateN(v);
+        	t = splineInterpolation(tg, n, v);
         	System.out.println("finnished sani calculation.\nThe results are:");
         	System.out.println("\tN is "+n);
         	System.out.println("\n\tT is "+Arrays.toString(t));
         }
 
+	}
+	
+	public int getN(){
+		return n;
+	}
+	
+	public double[] getT(){
+		return t;
 	}
 	
 	private int loadArrays() {
@@ -73,22 +81,13 @@ public class SaniCalculator {
 		return 1;
 	}
 	
-	private void input() {
-		final Scanner scanner = new Scanner( System.in );
-        System.out.print("Enter Value for Tu: ");
-        tu = Integer.parseInt(scanner.nextLine());
-        System.out.print("Enter Value for Tg: ");
-        tg = Integer.parseInt(scanner.nextLine());
-        scanner.close();
-	}
-	
-	private boolean verifyInput() {
+	private boolean verifyInput(double tu, double tg) {
 		if (tu <= 0 || tg <= 0) {
 			System.out.println("Values must be greater than 0");
 			return false;
 		}
 		else {
-			float v = tu / (float)tg;
+			double v = calculateV(tu, tg);
 			if ( v > 0.64173) {
 				System.out.println("Tu/Tg too great --> N would be greater than 8");
 				return false;
@@ -105,7 +104,7 @@ public class SaniCalculator {
 	}
 	
 	private double calculateV(double tu, double tg){
-		return tu / (double)tg;
+		return tu / tg;
 	}
 	
 	private int calculateN(double v) {
@@ -134,20 +133,17 @@ public class SaniCalculator {
 		else {
 			n = 10;
 		}
+		System.out.println("\tv is "+v);
 		System.out.println("\tN is "+n);
 		return n;
 	}
 	
 	private double[] splineInterpolation(double tg, int n, double v) {
 		
-		double[] li = new double[50];
-		int index = 0;
-		for (double i = 0; i < 1; i += 1.0/50){
-		    li[index] = i;
-			index ++;
-		}
+		double[] li = MathLibrary.linspace(0, 1, 50);
 		System.out.println();
-			
+		
+		//---------------- Old Spline Stuff ----------------
 		SplineInterpolator splineInterpolator = new SplineInterpolator();
 		PolynomialSplineFunction splineFunction = splineInterpolator.interpolate(tuTg[n-1], li);
 		double r = splineFunction.value(v);
@@ -158,6 +154,25 @@ public class SaniCalculator {
 		double w = splineFunction.value(r);
 		
 		System.out.println("\tw is "+w);
+		
+		
+		//---------------- New Spline Stuff ----------------
+		double[] linearTerms = new double[50];
+		double[] quadraticTerms = new double[50];
+		double[] cubicTerms = new double[50];
+		SplineNAK.cubic_nak(50, tuTg[n-1], li, linearTerms, quadraticTerms, cubicTerms);
+		r = SplineNAK.spline_eval(50, tuTg[n-1], li, linearTerms, quadraticTerms, cubicTerms, v);
+
+		System.out.println("\trNew is "+r);
+		
+		SplineNAK.cubic_nak(50, li, tTg[n-1], linearTerms, quadraticTerms, cubicTerms);
+		w = SplineNAK.spline_eval(50, li, tTg[n-1], linearTerms, quadraticTerms, cubicTerms, r);
+		
+		System.out.println("\twNew is "+w);
+		
+		//---------------- Set to Matlab Values for testing  ----------------
+		//r = 0.839347581202894;
+		//w = 0.243907499851280;
 		
 		double[] result = new double[n];
 		result[n-1] = w*tg;

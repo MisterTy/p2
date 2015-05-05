@@ -90,5 +90,16 @@ public class MathLibrary {
 		return space;
     	
     }
+    
+	public static double findMax(double[] werte){
+		double maximalwert=werte[0];
+		for (int i = 0; i < werte.length; i++) if(werte[i]>maximalwert)maximalwert=werte[i];
+		return maximalwert;
+	}
+	public static double findMin(double[] werte){
+		double maximalwert=werte[0];
+		for (int i = 0; i < werte.length; i++) if(werte[i]<maximalwert)maximalwert=werte[i];
+		return maximalwert;
+	}
 
 }
