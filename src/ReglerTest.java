@@ -10,16 +10,22 @@ import org.apache.commons.math3.util.MathArrays;
 public class ReglerTest extends JFrame{
 	
 	static int anzahlPunkte=100;
-	static int n=2;
-	static double[] T ={8.6818,14.2046};
+	static int n=5;
+	static double ks=1;
+	static double[] T ={5.7821,6.7547,7.8909,9.2183,10.7689};
 	static double Tmax=findMax(T);
 	static double Tmin=findMin(T);
 
 	public static void main(String[] args) {
 		double[] antwort=null;
+		
+		FaustformelRegler ffr=new FaustformelRegler();
+		ffr.Oppelt(0, 0, 0, "blaa");
+		
     	System.out.println("PIReglertest");
     	
-       	antwort=Phasengangmethode(MathLibrary.logspace(Math.log10(1/(Tmax*10)),Math.log10(1/(Tmin/10)),anzahlPunkte),0.5,Math.PI/4);
+    	
+       	antwort=Phasengangmethode(MathLibrary.logspace(Math.log10(1/(Tmax*10)),Math.log10(1/(Tmin/10)),anzahlPunkte),ks,Math.PI/4);
     	
     	
     	
@@ -42,10 +48,8 @@ public class ReglerTest extends JFrame{
 
 		
 		PIRegler piRegler=new PIRegler(Gs, w, phir, ks, T);
-		piRegler.berechnungTn();
-		
-		
-	
+		piRegler.compute();
+		piRegler.konsoleOut();
 		return ans;
 		
 	}
