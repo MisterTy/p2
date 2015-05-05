@@ -59,7 +59,14 @@ public class Model extends Observable {
     			regelKreisListe.add(regelkreis);
     			break;
     	}
-    	
+    }
+    
+    public void removeRegelkreis(){
+    	regelKreisListe.remove(0);
+    }
+    
+    public double[] getResult(){
+    	return regelKreisListe.get(0).regler.getResult();
     }
     
     public void output(){

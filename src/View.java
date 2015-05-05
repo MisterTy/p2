@@ -49,6 +49,14 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 
 public class View extends JPanel implements Observer, ActionListener {
+	static final int initState = 1;
+	static final int calculatingState = 2;
+	static final int modifyPIDState = 3;
+	static final int modifyPIState = 4;
+	
+	static final String numFormat = "%1$,.3f";
+	
+	private int state = initState;
 
 	private JPanel 	panel1=new JPanel();
 	private JPanel 	panel2=new JPanel();
@@ -60,9 +68,9 @@ public class View extends JPanel implements Observer, ActionListener {
 	private JLabel lbTu=new JLabel("Tu: ");
 	private JEngineeringTextField tfTu =new JEngineeringTextField(0);
 	private JLabel lbTg=new JLabel("Tg: ");
-	private JTextField tfTg =new JTextField("");
+	private JEngineeringTextField tfTg =new JEngineeringTextField(0);
 	private JLabel lbk=new JLabel("k: ");
-	private JTextField tfk =new JTextField("");
+	private JEngineeringTextField tfk =new JEngineeringTextField(0);
 	
 	
 	private JToggleButton btPID =new JToggleButton("PID");
@@ -87,26 +95,40 @@ public class View extends JPanel implements Observer, ActionListener {
 	private JLabel lbTv=new JLabel("Tv: ");
 	private JTextField tfTv =new JTextField("");
 	private JSlider sliderTv =new JSlider(0,100,50);
+	private JLabel lbTp=new JLabel("Tp: ");
+	private JTextField tfTp =new JTextField("");
+	private JSlider sliderTp =new JSlider(0,100,50);
 	
 	
 	private JTextField tfKonsole =new JTextField("Konsole...");
 	private JPanel panelLegende=new JPanel();
 	
+	private Controller actionHandler;
+	
 
 	
 	public View() {
-		
-		
-		
+
 		super(new GridBagLayout());
 		super.setBackground(Color.lightGray);
 
 		btGroup.add(btPI);
 		btGroup.add(btPID);
 		
+		btBerechnen.addActionListener(this);
+		btClear.addActionListener(this);
+		
 		tfTu.setMaxValue(100);
 		tfTu.setMinValue(0);
-		tfTu.setEmptyAllowed(true);
+		tfTu.setEmptyAllowed(false);
+		
+		tfTg.setMaxValue(100);
+		tfTg.setMinValue(0);
+		tfTg.setEmptyAllowed(false);
+		
+		tfk.setMaxValue(100);
+		tfk.setMinValue(0);
+		tfk.setEmptyAllowed(false);
 
 
 		
@@ -165,9 +187,6 @@ public class View extends JPanel implements Observer, ActionListener {
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
 						0, 0, 0, 2), 0, 0));
 		
-
-		
-
 		panel1.setLayout(new GridBagLayout());
 		Insets ins1=new Insets(5,5,5,5);
 		
@@ -247,6 +266,13 @@ public class View extends JPanel implements Observer, ActionListener {
 				GridBagConstraints.NORTH, GridBagConstraints.NONE, ins1, 0, 0));
 		panel3.add(tfTv, new GridBagConstraints(1, 5, 1, 1, 0.0, 0.0,
 				GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,ins1, 0, 0));
+		panel3.add(sliderTp, new GridBagConstraints(0, 6, 2, 1, 0.0, 0.0,
+				GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, new Insets(3, 0, 0, 0), 0, 0));
+		panel3.add(lbTp, new GridBagConstraints(0, 7, 1, 1, 0.0, 0.0,
+				GridBagConstraints.NORTH, GridBagConstraints.NONE, ins1, 0, 0));
+		panel3.add(tfTp, new GridBagConstraints(1, 7, 1, 1, 0.0, 0.0,
+				GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,ins1, 0, 0));
+
 
 		
 		
@@ -262,11 +288,6 @@ public class View extends JPanel implements Observer, ActionListener {
 		
 		panel4.add(tfKonsole, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
-		
-		
-
-		
-		
 
 		slider.setPaintTicks(true);
 		slider.setMajorTickSpacing(1);
@@ -278,14 +299,8 @@ public class View extends JPanel implements Observer, ActionListener {
 		panel4.setBackground(Color.white);
 		panel5.setBackground(Color.white);
 		
-		
-		
-
-
-		
-		
-		
-		
+		setState(initState);
+	
 	}
 
 
@@ -293,6 +308,113 @@ public class View extends JPanel implements Observer, ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		
+		if (e.getSource() == this.btBerechnen){
+			actionHandler.berechnenPressed(tfTu.getValue(), tfTg.getValue(), tfk.getValue(), btPID.isSelected(), btPI.isSelected());
+		} else if (e.getSource() == this.btClear){
+			actionHandler.clearPressed();
+		}
+	}
+	
+	public void setActionHandler(Controller actionHandler){
+		this.actionHandler = actionHandler;
+	}
+	
+	public void updateKr(Double kr){
+		kr.toString();
+		tfKr.setText(String.format(numFormat, kr));
+		sliderKr.setValue(kr.intValue());
+	}
+	public void updateTn(Double tn){
+		tfTn.setText(String.format(numFormat, tn));
+		sliderTn.setValue(tn.intValue());
+	}
+	public void updateTv(Double tv){
+		tfTv.setText(String.format(numFormat, tv));
+		sliderTv.setValue(tv.intValue());
+	}
+	public void updateTp(Double tp){
+		tfTp.setText(String.format(numFormat, tp));
+		sliderTp.setValue(tp.intValue());
+	}
+	
+	public void setState(int newState){
+		state = newState;
+		switch (state){
+			case initState:
+				tfTu.setEnabled(true);
+				tfTg.setEnabled(true);
+				tfk.setEnabled(true);
+				slider.setEnabled(true);
+				btClear.setEnabled(false);
+				btBerechnen.setEnabled(true);
+				btPID.setEnabled(true);
+				btPI.setEnabled(true);
+				sliderKr.setEnabled(false);
+				sliderTn.setEnabled(false);
+				sliderTv.setEnabled(false);
+				sliderTp.setEnabled(false);
+				tfKr.setEnabled(false);
+				tfTn.setEnabled(false);
+				tfTv.setEnabled(false);
+				tfTp.setEnabled(false);
+				break;
+				
+			case calculatingState:
+				tfTu.setEnabled(false);
+				tfTg.setEnabled(false);
+				tfk.setEnabled(false);
+				slider.setEnabled(false);
+				btClear.setEnabled(true);
+				btBerechnen.setEnabled(false);
+				btPID.setEnabled(false);
+				btPI.setEnabled(false);
+				sliderKr.setEnabled(false);
+				sliderTn.setEnabled(false);
+				sliderTv.setEnabled(false);
+				sliderTp.setEnabled(false);
+				tfKr.setEnabled(false);
+				tfTv.setEnabled(false);
+				tfTn.setEnabled(false);
+				tfTp.setEnabled(false);
+				break;
+				
+			case modifyPIDState:
+				tfTu.setEnabled(false);
+				tfTg.setEnabled(false);
+				tfk.setEnabled(false);
+				slider.setEnabled(false);
+				btClear.setEnabled(true);
+				btBerechnen.setEnabled(false);
+				btPID.setEnabled(false);
+				btPI.setEnabled(false);
+				sliderKr.setEnabled(true);
+				sliderTn.setEnabled(true);
+				sliderTv.setEnabled(true);
+				sliderTp.setEnabled(true);
+				tfKr.setEnabled(true);
+				tfTn.setEnabled(true);
+				tfTv.setEnabled(true);
+				tfTp.setEnabled(true);
+				break;
+				
+			case modifyPIState:
+				tfTu.setEnabled(false);
+				tfTg.setEnabled(false);
+				tfk.setEnabled(false);
+				slider.setEnabled(false);
+				btClear.setEnabled(true);
+				btBerechnen.setEnabled(false);
+				btPID.setEnabled(false);
+				btPI.setEnabled(false);
+				sliderKr.setEnabled(true);
+				sliderTv.setEnabled(true);
+				sliderTn.setEnabled(false);
+				sliderTp.setEnabled(false);
+				tfKr.setEnabled(true);
+				tfTn.setEnabled(true);
+				tfTv.setEnabled(false);
+				tfTp.setEnabled(false);
+				break;
+		}
 	}
 }
