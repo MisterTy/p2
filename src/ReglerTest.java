@@ -47,7 +47,8 @@ public class ReglerTest extends JFrame{
 		for (int i = 0; i < Gs.length; i++) Gs[i]=Gs[i].multiply(ks);//Gs Liste komp.
 
 		
-		PIRegler piRegler=new PIRegler(Gs, w, phir, ks, T);
+		PIRegler piRegler=new PIRegler();
+		piRegler.setValues(Gs, w, phir, ks, T);
 		piRegler.compute();
 		System.out.println(Arrays.toString(piRegler.getResult()));
 		return ans;
