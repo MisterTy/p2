@@ -7,11 +7,6 @@ import org.apache.commons.math3.complex.Complex;
  * 
  */
 public class PIDRegler extends GenericRegler {
-	Complex[] gs;
-	double[] w;
-	double phir;
-	double kS;
-	double[] t;
 
     /**
      * 
@@ -20,17 +15,8 @@ public class PIDRegler extends GenericRegler {
     	
     }
     
-    public void setValues(Complex[] utfStrecke, double[] kreisFrequenzSpektrum, double phasenrand, double verstarkungStrecke, double[] zeitkonstante) {
-    	gs = utfStrecke;
-    	w = kreisFrequenzSpektrum;
-    	phir = phasenrand;
-    	kS = verstarkungStrecke;
-    	t = zeitkonstante;
-    }
-    
     public void compute() {
     	// Phase der Strecke berechnen
-    	System.out.println("Phase berechnen");
     	int size = gs.length;
     	double[] phi_s = new double[size];
     	for (int i=0; i<size; i++){
@@ -38,17 +24,9 @@ public class PIDRegler extends GenericRegler {
     	}
     	
     	// Sprung bei -pi entfernen
-    	for (int i=0; i<size; i++){
-    		if (phi_s[i] > 0){
-    			for (int j=0; j<size; j++){
-    				phi_s[j] = -2*Math.PI + phi_s[j];
-    			}
-    			break;
-    		}
-    	}
+    	phi_s = sprungEntfernen(phi_s);
     	
     	// Index von phi = -135 finden, wPID berechnen
-    	System.out.println("phi=-135");
     	int[] indeces = MathLibrary.int_ver(phi_s, -3*Math.PI/4);
     	int leftIndex = indeces[0];
     	int rightIndex = indeces[1];
@@ -58,7 +36,6 @@ public class PIDRegler extends GenericRegler {
     	double phi_s_m = (phi_s[rightIndex] - phi_s[leftIndex]) / (w[rightIndex] - w[leftIndex]);
     	
     	// Beta und Tnk/Tvk berechnen
-    	System.out.println("beta tnk tvk");
     	double ko = -0.5 - (wpid * phi_s_m);
     	double beta;
     	if (ko > 1){
@@ -73,7 +50,6 @@ public class PIDRegler extends GenericRegler {
     	double tvk = 1 / (wpid / beta);
     	
     	// Übertragungsfunktion des provisorischen Reglers (mit K=1)
-    	System.out.println("prov übertragungsfunktion");
     	double tp = tvk / 10;
     	Complex[] grp = new Complex[size];
     	Complex oneOneJ = new Complex(1, 1);
@@ -89,7 +65,6 @@ public class PIDRegler extends GenericRegler {
     	
     	// Übertragungsfunktion des offenen Regelkreises
     	// Und Durchtrittspunkt wD bestimmen
-    	System.out.println("durchtrittspunkt");
     	Complex[] gOffen = new Complex[size];
     	for (int i=0; i<size; i++){
     		gOffen[i] = grp[i].multiply(gs[i]);
@@ -102,15 +77,7 @@ public class PIDRegler extends GenericRegler {
     	}
     	
     	// Sprung bei -pi entfernen
-    	System.out.println("sprung2");
-    	for (int i=0; i<size; i++){
-    		if (phi_go[i] > 0) {
-    			for (int j=i; j<size; i++){
-    				phi_go[j] = -2 * Math.PI + phi_go[j];
-    			}
-    			break;
-    		}
-    	}
+    	phi_go = sprungEntfernen(phi_go);
     	
     	int[] indecesWd = MathLibrary.int_ver(phi_go, -Math.PI + phir);
     	int leftIndexWd = indecesWd[0];
@@ -118,7 +85,6 @@ public class PIDRegler extends GenericRegler {
     	double wD = (w[leftIndexWd] + w[rightIndexWd]) / 2;
     	
     	// Krk bestimmen
-    	System.out.println("krk");
     	int sizeT = t.length;
     	Complex gsWd = Complex.ONE;
     	for (int i=0; i<sizeT; i++){
@@ -138,13 +104,11 @@ public class PIDRegler extends GenericRegler {
     	double krk = Math.pow(krk_db / 20, 10);
     	
     	// Umrechnung in Reglerkonforme Werte
-    	System.out.println("reglerkonform");
     	double tv = (tnk * tvk) / (tnk + tvk - tp) - tp;
     	double tn = tnk + tvk - tp;
     	double kR = (krk * (tnk + tvk - tp)) / tnk;
     	
     	// Berechnete Werte zurückgeben
-    	System.out.println("rückgabe");
     	result[0] = kR;
     	result[1] = tn;
     	result[2] = tv;

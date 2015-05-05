@@ -13,21 +13,16 @@ public class PIRegler extends GenericRegler {
 	
 	
 	private double[] phi_s; 
-	private double[] w;
 	private double[] phi_rprov;
 	private double[] phi_0;
-	private double[] t;
 	
 	private double tn;
 	private double tv;
 	private double tp;
-	private double kS;
 	private double kR;
-	private double phir;
 	private double wD;
 	
 	private Complex[] grp;
-	private Complex[] gs;
 	
 	private Complex grp_wd;
 	private Complex g_str_wd;
@@ -40,24 +35,13 @@ public class PIRegler extends GenericRegler {
    * @param w
    * @param phir
    * @param kS
-   * @param T
+   * @param t
    */
-    public PIRegler(Complex[] gs, double w[],double phir,double kS, double[] T) {
-
-    	int lGs=gs.length;
-    	this.gs=gs;
-    	this.w=w;
-    	this.phir=phir;
-    	this.t=T;
-    	this.kS=kS;
+    public PIRegler() {
     	
     	tv=-1;
     	tp=-1;
     	
-    	phi_s= new double[lGs];
-    	phi_rprov= new double[lGs];
-    	phi_0= new double[lGs];
-    	grp= new Complex[lGs];
     	
   }
 
@@ -118,54 +102,21 @@ public class PIRegler extends GenericRegler {
      * Führt die Berechnung des PI Reglers durch
      */
     public void compute(){
+    	
+    	phi_s= new double[gs.length];
+    	phi_rprov= new double[gs.length];
+    	phi_0= new double[gs.length];
+    	grp= new Complex[gs.length];
+    	
     	berechnungTn();
     	berechnungWD();
     	berechnungStrecke();
     	berechnungOffenerRegelkreis();
     	
-    	System.out.println("rückgabe");
     	result[0] = kR;
     	result[1] = tn;
     	result[2] = tv;
     	result[3] = tp;
-    }
-    
-    /**
-     * Neue Gs Liste übergeben
-     * @param gs
-     */
-    public void setGs(Complex[] gs){
-    	this.gs=gs;
-    }
-    
-    /**
-     * Neue Omega Liste übergeben
-     * @param w
-     */
-    public void setW(double[] w){
-    	this.w=w;
-    }
-    /**
-     * Neuer Phasenrand übergeben
-     * @param phir
-     */
-    public void setPhir(double phir){
-    	this.phir=phir;
-    }
-    
-    /**
-     * Neue Verstärkung übergeben
-     * @param kS
-     */
-    public void setkS(double kS){
-    	this.kS=kS;
-    }
-    /**
-     * Neue Zeitkonstanten übergeben
-     * @param t
-     */
-    public void setT(double[] t){
-    	this.t=t;
     }
     
     

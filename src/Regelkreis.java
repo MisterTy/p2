@@ -1,4 +1,6 @@
 
+import java.util.Arrays;
+
 import org.apache.commons.math3.complex.Complex;
 
 /**
@@ -15,9 +17,13 @@ public class Regelkreis {
     	
     	switch (type){
 		case Model.piRegler:
+			regler = new PIRegler();
+			regler.reglerTyp = Model.piRegler;
+			regler.setValues(utfStrecke, kreisFrequenzSpektrum, phasenrand, verstarkungStrecke, zeitkonstante);
+			regler.compute();
 			break;
 		case Model.pidRegler:
-			PIDRegler regler = new PIDRegler();
+			regler = new PIDRegler();
 			regler.reglerTyp = Model.pidRegler;
 			regler.setValues(utfStrecke, kreisFrequenzSpektrum, phasenrand, verstarkungStrecke, zeitkonstante);
 			regler.compute();
@@ -27,7 +33,7 @@ public class Regelkreis {
     }
     
     public void output(){
-    	System.out.print("Regler Typ: "+regler.reglerTyp + "Resultat: "+regler.getResult());
+    	System.out.println("Regler Typ: "+regler.reglerTyp+" Resultat: "+Arrays.toString(regler.getResult()));
     }
 
 }

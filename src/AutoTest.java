@@ -6,10 +6,22 @@ public class AutoTest {
 		boolean valid = false;
 		double tu=-1; double tg=-1; double phir=-1; double ks=-1; int typ=-1;
 		switch (testNr){
-			case 1:
+			case 1:		// Strecke 1 PID
 				valid = true;
-				tu = 3.08; tg = 30.8; phir = 0.785; ks = 0.5; typ = 2;
+				tu = 3.08; tg = 30.8; phir = Math.PI/4; ks = 0.5; typ = 2;
 	            break;
+			case 2:		// Strecke 1 PI
+				valid = true;
+				tu = 3.08; tg = 30.8; phir = Math.PI/4; ks = 0.5; typ = 1;
+	            break;
+			case 3:		// Strecke 7 PID
+				valid = true;
+				tu = 16.6; tg = 41.7; phir = Math.PI/4; ks = 1; typ = 2;
+				break;
+			case 4:		// Strecke 7 PI
+				valid = true;
+				tu = 16.6; tg = 41.7; phir = Math.PI/4; ks = 1; typ = 1;
+				break;
 	        default:
 	        	valid = false;
 	        	System.out.println("Invalid TestNr");
@@ -18,15 +30,10 @@ public class AutoTest {
 		if (valid){
 			System.out.println("Tu: "+tu+" Tg: "+tg+" phir: "+phir+" ks: "+ks+" typ: "+typ);
 			model.setAnzahlPunkte(anzahlPunkte);
-			System.out.println("after setPunkte");
             model.setStrecke(tu, tg);
-            System.out.println("after setStrecke");
             model.setPhasenrand(phir);
-            System.out.println("after setPhasenrand");
             model.setVerstarkung(ks);
-            System.out.println("after setVerstarkung");
             model.addRegelkreis(typ);
-            System.out.println("after addRegelkreis");
             model.output();
 		}
 	}

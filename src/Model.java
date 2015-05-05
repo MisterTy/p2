@@ -32,6 +32,7 @@ public class Model extends Observable {
     
     public void setStrecke(double tu, double tg){
     	strecke = new Strecke(tu, tg);
+    	zeitkonstante = strecke.getCoeffitients();
     	
     	// KreisW berechnen
     	double[] coeffitients = strecke.getCoeffitients();
@@ -53,9 +54,7 @@ public class Model extends Observable {
     
     public void addRegelkreis(int type){
     	switch (type){
-    		case piRegler:
-    			break;
-    		case pidRegler:
+    		case piRegler: case pidRegler:
     			Regelkreis regelkreis = new Regelkreis(type, utfStrecke, kreisFrequenzSpektrum, phasenrand, verstarkungStrecke, zeitkonstante);
     			regelKreisListe.add(regelkreis);
     			break;
