@@ -67,16 +67,8 @@ public class PIRegler extends GenericRegler {
     	
     	for (int i = 0; i < gs.length; i++)  phi_s[i] = gs[i].getArgument();
     	
-    	
-
-    	for (int y = 0; y < phi_s.length; y++) {
-    		if(phi_s[y]>0){
-    			for(int z=y;z < phi_s.length; z++)	phi_s[z]=-2*Math.PI+phi_s[z];
-    			break;
-    		}   		
-		}
-    	
-    	
+       	phi_s=sprungEntfernen(phi_s);
+    	    	
     	int ind_left=MathLibrary.int_ver(phi_s, -(1.57079))[0];
     	int ind_right=MathLibrary.int_ver(phi_s, -(1.57079))[1];
     	
@@ -92,12 +84,8 @@ public class PIRegler extends GenericRegler {
     	for (int i = 0; i < grp.length; i++) phi_rprov[i]=grp[i].getArgument();
     	for (int i = 0; i < grp.length; i++) phi_0[i]=phi_s[i]+phi_rprov[i];
     	
-    	for (int y = 0; y < phi_0.length; y++) {
-    		if(phi_s[y]>0){
-    			for(int z=y;z < phi_0.length; z++)	phi_0[z]=-2*Math.PI+phi_0[z];
-    			break;
-    		}   		
-		}
+    	phi_0=sprungEntfernen(phi_0);
+    	
     	int ind_left=MathLibrary.int_ver(phi_0, -Math.PI+phir)[0];
     	int ind_right=MathLibrary.int_ver(phi_0, -Math.PI+phir)[1];
     	wD=((w[ind_left]+w[ind_right])/2);
