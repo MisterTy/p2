@@ -20,6 +20,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.EventObject;
 
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
@@ -35,6 +36,8 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
@@ -48,7 +51,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 
 
-public class View extends JPanel implements Observer, ActionListener {
+public class View extends JPanel implements Observer, ActionListener, ChangeListener {
 	static final int initState = 1;
 	static final int calculatingState = 2;
 	static final int modifyPIDState = 3;
@@ -88,16 +91,16 @@ public class View extends JPanel implements Observer, ActionListener {
 	
 	private JLabel lbKr=new JLabel("Kr: ");
 	private JTextField tfKr =new JTextField("");
-	private JSlider sliderKr =new JSlider(0,100,50);
+	private JSlider sliderKr =new JSlider(0,100000,50000);
 	private JLabel lbTn=new JLabel("Tn: ");
 	private JTextField tfTn =new JTextField("");
-	private JSlider sliderTn =new JSlider(0,100,50);
+	private JSlider sliderTn =new JSlider(0,100000,50000);
 	private JLabel lbTv=new JLabel("Tv: ");
 	private JTextField tfTv =new JTextField("");
-	private JSlider sliderTv =new JSlider(0,100,50);
+	private JSlider sliderTv =new JSlider(0,100000,50000);
 	private JLabel lbTp=new JLabel("Tp: ");
 	private JTextField tfTp =new JTextField("");
-	private JSlider sliderTp =new JSlider(0,100,50);
+	private JSlider sliderTp =new JSlider(0,100000,50000);
 	
 	
 	private JTextField tfKonsole =new JTextField("Konsole...");
@@ -244,7 +247,13 @@ public class View extends JPanel implements Observer, ActionListener {
 		sliderTn.setMinimumSize(new Dimension(150, 25));
 		sliderTv.setPreferredSize(new Dimension(150, 25));
 		sliderTv.setMinimumSize(new Dimension(150, 25));
+		sliderTp.setPreferredSize(new Dimension(150, 25));
+		sliderTp.setMinimumSize(new Dimension(150, 25));
 		
+		sliderKr.addChangeListener(this);
+		sliderTn.addChangeListener(this);
+		sliderTv.addChangeListener(this);
+		sliderTp.addChangeListener(this);
 
 		
 		panel3.setLayout(new GridBagLayout());
@@ -307,11 +316,24 @@ public class View extends JPanel implements Observer, ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
-		if (e.getSource() == this.btBerechnen){
+		Object eventSource = e.getSource();
+		if (eventSource == btBerechnen){
 			actionHandler.berechnenPressed(tfTu.getValue(), tfTg.getValue(), tfk.getValue(), btPID.isSelected(), btPI.isSelected());
-		} else if (e.getSource() == this.btClear){
+		} else if (eventSource == btClear){
 			actionHandler.clearPressed();
+		}
+	}
+	
+	public void stateChanged(ChangeEvent e){
+		Object eventSource = e.getSource();
+		if (eventSource == sliderKr){
+			actionHandler.krUpdated(sliderKr.getValue());
+		} else if (eventSource == sliderTn) {
+			actionHandler.tnUpdated(sliderTn.getValue());
+		} else if (eventSource == sliderTv) {
+			actionHandler.tvUpdated(sliderTv.getValue());
+		} else if (eventSource == sliderTp) {
+			actionHandler.tpUpdated(sliderTp.getValue());
 		}
 	}
 	
@@ -319,22 +341,52 @@ public class View extends JPanel implements Observer, ActionListener {
 		this.actionHandler = actionHandler;
 	}
 	
+	public void updateParam(Double newValue, String param){
+		JSlider updateSlider = sliderKr;
+		JTextField updateTf = tfKr;
+		switch (param){
+			case "kr":
+				updateSlider = sliderKr;
+				updateTf = tfKr;
+				break;
+			case "tn":
+				updateSlider = sliderTn;
+				updateTf = tfTn;
+				break;
+			case "tv":
+				updateSlider = sliderTv;
+				updateTf = tfTv;
+				break;
+			case "tp":
+				updateSlider = sliderTp;
+				updateTf = tfTp;
+				break;
+		}
+		if (updateSlider.getValue() != newValue.intValue() * 1000){
+			updateTf.setText(String.format(numFormat, newValue));
+			updateSlider.setValue(newValue.intValue() * 1000);
+		}
+	}
+	
 	public void updateKr(Double kr){
-		kr.toString();
-		tfKr.setText(String.format(numFormat, kr));
-		sliderKr.setValue(kr.intValue());
+		if (sliderKr.getValue() != kr.intValue() * 1000){
+			tfKr.setText(String.format(numFormat, kr));
+			sliderKr.setValue(kr.intValue() * 1000);
+		}
 	}
 	public void updateTn(Double tn){
-		tfTn.setText(String.format(numFormat, tn));
-		sliderTn.setValue(tn.intValue());
+		if (sliderTn.getValue() != tn.intValue() * 1000){
+			tfTn.setText(String.format(numFormat, tn));
+			sliderTn.setValue(tn.intValue() * 1000);
+		}
 	}
 	public void updateTv(Double tv){
 		tfTv.setText(String.format(numFormat, tv));
-		sliderTv.setValue(tv.intValue());
+		sliderTv.setValue(tv.intValue() * 1000);
 	}
 	public void updateTp(Double tp){
 		tfTp.setText(String.format(numFormat, tp));
-		sliderTp.setValue(tp.intValue());
+		sliderTp.setValue(tp.intValue() * 1000);
 	}
 	
 	public void setState(int newState){
@@ -407,8 +459,8 @@ public class View extends JPanel implements Observer, ActionListener {
 				btPID.setEnabled(false);
 				btPI.setEnabled(false);
 				sliderKr.setEnabled(true);
-				sliderTv.setEnabled(true);
-				sliderTn.setEnabled(false);
+				sliderTn.setEnabled(true);
+				sliderTv.setEnabled(false);
 				sliderTp.setEnabled(false);
 				tfKr.setEnabled(true);
 				tfTn.setEnabled(true);

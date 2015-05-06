@@ -94,10 +94,23 @@ public class Controller implements Runnable {
     	smartLoopView.setState(View.initState);
     }
     
+    public void krUpdated(int newValue){
+    	smartLoopView.updateParam(newValue / 1000.0, "kr");
+    }
+    public void tnUpdated(int newValue){
+    	smartLoopView.updateParam(newValue / 1000.0, "tn");
+    }
+    public void tvUpdated(int newValue){
+    	smartLoopView.updateParam(newValue / 1000.0, "tv");
+    }
+    public void tpUpdated(int newValue){
+    	smartLoopView.updateParam(newValue / 1000.0, "tp");
+    }
+    
     /**
-     * Überprüft ob die Werte für Tu, Tg und k plausibel sind.
+     * ��berpr��ft ob die Werte f��r Tu, Tg und k plausibel sind.
      * Getestet wird:
-     *  - Verhältnis tu/tg nicht zu gross und nicht zu klein
+     *  - Verh��ltnis tu/tg nicht zu gross und nicht zu klein
      *  - k nicht negativ
      *  - entweder PI oder PID selektiert
      *  
