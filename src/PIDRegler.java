@@ -52,15 +52,15 @@ public class PIDRegler extends GenericRegler {
     	// Übertragungsfunktion des provisorischen Reglers (mit K=1)
     	double tp = tvk / 10;
     	Complex[] grp = new Complex[size];
-    	Complex oneOneJ = new Complex(1, 1);
     	Complex temp;
+    	Complex upper;
+    	Complex lower;
     	// Grp = Krk.*((1+1j.*w.*Tnk)./(1j.*w.*Tnk)).*((1+1j.*w.*Tvk)./(1+1j.*w.*Tp));
     	for (int i=0; i<size; i++){
-    		temp = oneOneJ.multiply(w[i] * tnk);			// (1+1j.*w.*Tnk)
-    		temp.divide(Complex.I.multiply(w[i] * tnk));	// /(1j.*w.*Tnk)
-    		temp.multiply(oneOneJ.multiply(w[i] * tvk));	// *(1+1j.*w.*Tvk)
-    		temp.divide(oneOneJ.multiply(w[i] * tp));		// /(1+1j.*w.*Tp)
-    		grp[i] = temp;
+    		upper = new Complex(1, w[i]*tnk).multiply(new Complex(1, w[i]*tvk));
+    		lower = new Complex(0, w[i]*tnk).multiply(new Complex(1, w[i]*tp));
+    		grp[i] = upper.divide(lower);
+    		
     	}
     	
     	// Übertragungsfunktion des offenen Regelkreises
@@ -78,30 +78,34 @@ public class PIDRegler extends GenericRegler {
     	
     	// Sprung bei -pi entfernen
     	phi_go = sprungEntfernen(phi_go);
-    	
     	int[] indecesWd = MathLibrary.int_ver(phi_go, -Math.PI + phir);
     	int leftIndexWd = indecesWd[0];
     	int rightIndexWd = indecesWd[1];
-    	double wD = (w[leftIndexWd] + w[rightIndexWd]) / 2;
+    	//double wD = (w[leftIndexWd] + w[rightIndexWd]) / 2;
+    	double wD = w[leftIndexWd];
     	
     	// Krk bestimmen
     	int sizeT = t.length;
     	Complex gsWd = Complex.ONE;
     	for (int i=0; i<sizeT; i++){
-    		gsWd = gsWd.multiply(Complex.ONE.divide(oneOneJ.multiply(wD * t[i])));	//Gs = Gs.*(1./(1+1j.*wD.*T(y)));
+    		gsWd = gsWd.multiply(new Complex(1, wD*t[i]).reciprocal());	//Gs = Gs.*(1./(1+1j.*wD.*T(y)));
     	}
     	Complex g_str_wd = gsWd.multiply(kS);
     	
     	// G_reg_wd = Krk * ((1+1j*wD*Tnk)/(1j*wD*Tnk))*((1+1j*wD*Tvk)/(1+1j*wD*Tp));
-    	temp = oneOneJ.multiply(wD * tnk);				// ((1+1j*wD*Tnk)
-    	temp.divide(Complex.I.multiply(wD * tnk));		// /(1j*wD*Tnk))
-    	temp.multiply(oneOneJ.multiply(wD * tvk));		// *((1+1j*wD*Tvk)
-    	temp.divide(oneOneJ.multiply(wD * tp));			// /(1+1j*wD*Tp))
+    	temp = new Complex(1, wD * tnk);				// ((1+1j*wD*Tnk)
+    	temp.divide(new Complex(0, wD * tnk));			// /(1j*wD*Tnk))
+    	temp.multiply(new Complex(1, wD*tvk));			// *((1+1j*wD*Tvk)
+    	temp.divide(new Complex(1, wD*tp));				// /(1+1j*wD*Tp))
     	Complex g_reg_wd = temp;
+    	
+    	upper = new Complex(1, wD * tnk).multiply(new Complex(1, wD * tvk));
+    	lower = new Complex(0, wD * tnk).multiply(new Complex(1, wD * tp));
+    	g_reg_wd = upper.divide(lower); 	
     	
     	Complex gOffen_wd = g_reg_wd.multiply(g_str_wd);
     	double krk_db = -20 * Math.log10(gOffen_wd.abs());
-    	double krk = Math.pow(krk_db / 20, 10);
+    	double krk = Math.pow(10, krk_db / 20);
     	
     	// Umrechnung in Reglerkonforme Werte
     	double tv = (tnk * tvk) / (tnk + tvk - tp) - tp;

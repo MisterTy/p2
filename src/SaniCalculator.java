@@ -22,13 +22,13 @@ public class SaniCalculator {
 		loadArrays();
 		
         if (verifyInput(tu, tg)){
-        	System.out.println("starting sani calculation with Tu = " + tu + ", Tg = " + tg);
+        	//System.out.println("starting sani calculation with Tu = " + tu + ", Tg = " + tg);
         	double v = calculateV(tu, tg);
         	n = calculateN(v);
         	t = splineInterpolation(tg, n, v);
-        	System.out.println("finnished sani calculation.\nThe results are:");
-        	System.out.println("\tN is "+n);
-        	System.out.println("\n\tT is "+Arrays.toString(t));
+        	//System.out.println("finnished sani calculation.\nThe results are:");
+        	//System.out.println("\tN is "+n);
+        	//System.out.println("\n\tT is "+Arrays.toString(t));
         }
 
 	}
@@ -42,7 +42,7 @@ public class SaniCalculator {
 	}
 	
 	private int loadArrays() {
-		System.out.println("Loading stored arrays TuTg and tTg ...");
+		//System.out.println("Loading stored arrays TuTg and tTg ...");
 		final String[] files = new String[2];
 		files[0] = "./lib/T_Tg.csv";
 		files[1] = "./lib/Tu_Tg.csv";
@@ -133,27 +133,27 @@ public class SaniCalculator {
 		else {
 			n = 10;
 		}
-		System.out.println("\tv is "+v);
-		System.out.println("\tN is "+n);
+		//System.out.println("\tv is "+v);
+		//System.out.println("\tN is "+n);
 		return n;
 	}
 	
 	private double[] splineInterpolation(double tg, int n, double v) {
 		
 		double[] li = MathLibrary.linspace(0, 1, 50);
-		System.out.println();
+		//System.out.println();
 		
 		//---------------- Old Spline Stuff ----------------
-		SplineInterpolator splineInterpolator = new SplineInterpolator();
-		PolynomialSplineFunction splineFunction = splineInterpolator.interpolate(tuTg[n-1], li);
-		double r = splineFunction.value(v);
+		//SplineInterpolator splineInterpolator = new SplineInterpolator();
+		//PolynomialSplineFunction splineFunction = splineInterpolator.interpolate(tuTg[n-1], li);
+		//double r = splineFunction.value(v);
 		
-		System.out.println("\tr is "+r);
+		//System.out.println("\tr is "+r);
 		
-		splineFunction = splineInterpolator.interpolate(li, tTg[n-1]);
-		double w = splineFunction.value(r);
+		//splineFunction = splineInterpolator.interpolate(li, tTg[n-1]);
+		//double w = splineFunction.value(r);
 		
-		System.out.println("\tw is "+w);
+		//System.out.println("\tw is "+w);
 		
 		
 		//---------------- New Spline Stuff ----------------
@@ -161,14 +161,14 @@ public class SaniCalculator {
 		double[] quadraticTerms = new double[50];
 		double[] cubicTerms = new double[50];
 		SplineNAK.cubic_nak(50, tuTg[n-1], li, linearTerms, quadraticTerms, cubicTerms);
-		r = SplineNAK.spline_eval(50, tuTg[n-1], li, linearTerms, quadraticTerms, cubicTerms, v);
+		double r = SplineNAK.spline_eval(50, tuTg[n-1], li, linearTerms, quadraticTerms, cubicTerms, v);
 
-		System.out.println("\trNew is "+r);
+		//System.out.println("\trNew is "+r);
 		
 		SplineNAK.cubic_nak(50, li, tTg[n-1], linearTerms, quadraticTerms, cubicTerms);
-		w = SplineNAK.spline_eval(50, li, tTg[n-1], linearTerms, quadraticTerms, cubicTerms, r);
+		double w = SplineNAK.spline_eval(50, li, tTg[n-1], linearTerms, quadraticTerms, cubicTerms, r);
 		
-		System.out.println("\twNew is "+w);
+		//System.out.println("\twNew is "+w);
 		
 		//---------------- Set to Matlab Values for testing  ----------------
 		//r = 0.839347581202894;
