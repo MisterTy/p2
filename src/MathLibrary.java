@@ -96,10 +96,31 @@ public class MathLibrary {
 		for (int i = 0; i < werte.length; i++) if(werte[i]>maximalwert)maximalwert=werte[i];
 		return maximalwert;
 	}
+	
 	public static double findMin(double[] werte){
 		double maximalwert=werte[0];
 		for (int i = 0; i < werte.length; i++) if(werte[i]<maximalwert)maximalwert=werte[i];
 		return maximalwert;
+	}
+	
+	public static final Complex[] freqs(double[] b, double[] a, double[] w) {
+		Complex[] res = new Complex[w.length];
+
+		for (int k = 0; k < res.length; k++) {
+			Complex jw = new Complex(0,w[k]);
+
+			Complex zaehler = new Complex(0, 0);
+			for (int i = 0; i < b.length; i++) {
+				zaehler = zaehler.add(jw.pow( b.length - i - 1).multiply(b[i]));
+			}
+
+			Complex nenner = new Complex(0, 0);
+			for (int i = 0; i < a.length; i++) {
+				nenner = nenner.add(jw.pow(a.length - i - 1).multiply(a[i]));
+			}
+			res[k] = zaehler.divide(nenner);
+		}
+		return res;
 	}
 
 }
