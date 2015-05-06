@@ -87,7 +87,7 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 	private JLabel lbUeberschwingen=new JLabel("Überschwingen");
 	private JLabel lbWenig=new JLabel("aperiodisch");
 	private JLabel lbViel=new JLabel("viel");
-	private JSlider slider = new JSlider(0,3,0);
+	private JSlider sliderPhir = new JSlider(0,3,0);
 	
 	private JLabel lbKr=new JLabel("Kr: ");
 	private JTextField tfKr =new JTextField("");
@@ -208,8 +208,8 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 				GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, ins1, 0, 0));
 		
 		
-		slider.setPreferredSize(new Dimension(150, 25));
-		slider.setMinimumSize(new Dimension(150, 25));
+		sliderPhir.setPreferredSize(new Dimension(150, 25));
+		sliderPhir.setMinimumSize(new Dimension(150, 25));
 		
 		btPID.setPreferredSize(new Dimension(50, 25));
 		btPI.setPreferredSize(new Dimension(50, 25));
@@ -230,7 +230,7 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 				GridBagConstraints.LINE_START, GridBagConstraints.NONE, new Insets(3, 0, 10, 0), 0, 0));
 		panel2.add(lbUeberschwingen, new GridBagConstraints(0, 1, 2, 1, 1.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(3, 0, 0, 0), 0, 0));
-		panel2.add(slider, new GridBagConstraints(0, 2, 2, 1, 0.0, 0.0,
+		panel2.add(sliderPhir, new GridBagConstraints(0, 2, 2, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(0, 25, 0, 25), 0, 0));
 		panel2.add(lbWenig, new GridBagConstraints(0, 3, 1, 1, 1.0, 0.0,
 				GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 10, 0, 0), 0, 0));
@@ -254,6 +254,7 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 		sliderTn.addChangeListener(this);
 		sliderTv.addChangeListener(this);
 		sliderTp.addChangeListener(this);
+		sliderPhir.addChangeListener(this);
 
 		
 		panel3.setLayout(new GridBagLayout());
@@ -298,8 +299,8 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 		panel4.add(tfKonsole, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
-		slider.setPaintTicks(true);
-		slider.setMajorTickSpacing(1);
+		sliderPhir.setPaintTicks(true);
+		sliderPhir.setMajorTickSpacing(1);
 		
 	
 		panel1.setBackground(Color.white);
@@ -318,7 +319,7 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 	public void actionPerformed(ActionEvent e) {
 		Object eventSource = e.getSource();
 		if (eventSource == btBerechnen){
-			actionHandler.berechnenPressed(tfTu.getValue(), tfTg.getValue(), tfk.getValue(), btPID.isSelected(), btPI.isSelected());
+			actionHandler.berechnenPressed(tfTu.getValue(), tfTg.getValue(), tfk.getValue(), btPID.isSelected(), btPI.isSelected(),sliderPhir.getValue());
 		} else if (eventSource == btClear){
 			actionHandler.clearPressed();
 		}
@@ -327,6 +328,7 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 	public void stateChanged(ChangeEvent e){
 		Object eventSource = e.getSource();
 		if (eventSource == sliderKr){
+			
 			actionHandler.krUpdated(sliderKr.getValue());
 		} else if (eventSource == sliderTn) {
 			actionHandler.tnUpdated(sliderTn.getValue());
@@ -334,6 +336,8 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 			actionHandler.tvUpdated(sliderTv.getValue());
 		} else if (eventSource == sliderTp) {
 			actionHandler.tpUpdated(sliderTp.getValue());
+		} else if(eventSource==sliderPhir) {
+			
 		}
 	}
 	
@@ -388,6 +392,10 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 		tfTp.setText(String.format(numFormat, tp));
 		sliderTp.setValue(tp.intValue() * 1000);
 	}
+	public void updateConsole(String text){
+		tfKonsole.setText(text);
+	}
+	
 	
 	public void setState(int newState){
 		state = newState;
@@ -396,7 +404,7 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 				tfTu.setEnabled(true);
 				tfTg.setEnabled(true);
 				tfk.setEnabled(true);
-				slider.setEnabled(true);
+				sliderPhir.setEnabled(true);
 				btClear.setEnabled(false);
 				btBerechnen.setEnabled(true);
 				btPID.setEnabled(true);
@@ -415,7 +423,7 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 				tfTu.setEnabled(false);
 				tfTg.setEnabled(false);
 				tfk.setEnabled(false);
-				slider.setEnabled(false);
+				sliderPhir.setEnabled(false);
 				btClear.setEnabled(true);
 				btBerechnen.setEnabled(false);
 				btPID.setEnabled(false);
@@ -434,7 +442,7 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 				tfTu.setEnabled(false);
 				tfTg.setEnabled(false);
 				tfk.setEnabled(false);
-				slider.setEnabled(false);
+				sliderPhir.setEnabled(false);
 				btClear.setEnabled(true);
 				btBerechnen.setEnabled(false);
 				btPID.setEnabled(false);
@@ -453,7 +461,7 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 				tfTu.setEnabled(false);
 				tfTg.setEnabled(false);
 				tfk.setEnabled(false);
-				slider.setEnabled(false);
+				sliderPhir.setEnabled(false);
 				btClear.setEnabled(true);
 				btBerechnen.setEnabled(false);
 				btPID.setEnabled(false);

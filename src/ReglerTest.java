@@ -17,6 +17,12 @@ public class ReglerTest extends JFrame{
 	static double Tmin=findMin(T);
 
 	public static void main(String[] args) {
+		
+		double[] a={9,5,6};
+		double[] b={1,0,1};
+		double[] w={5,6,7,8,9};
+		System.out.println(Arrays.toString(MathLibrary.freqs(a, b, w)));
+		
 		double[] antwort=null;
 
 		FaustformelRegler ffr=new FaustformelRegler();

@@ -34,8 +34,8 @@ public class Controller implements Runnable {
 		 view.setActionHandler(this);
 		 smartLoopView = view;
 		 frame.getContentPane().add(view);
-		 frame.setSize(700,400);
-		 frame.setMinimumSize(new Dimension(800, 550));
+		 frame.setSize(800,560);
+		 frame.setMinimumSize(new Dimension(800, 560));
 		 frame.setVisible(true);
     }
     
@@ -44,17 +44,31 @@ public class Controller implements Runnable {
     }
     
     
-    public void berechnenPressed(double tuValue, double tgValue, double kValue, boolean pidState, boolean piState){
+    public void berechnenPressed(double tuValue, double tgValue, double kValue, boolean pidState, boolean piState, int sliderPhirValue){
     	if (validateValues(tuValue, tgValue, kValue, pidState, piState)){
     		smartLoopView.setState(View.calculatingState);
+    		smartLoopView.updateConsole("Berechnete Werte werden ausgeben");
     		
     		int type = Model.pidRegler;
     		if (piState){
     			type = Model.piRegler;
     		}
-    		
     		double phir = Math.PI/4;
-    		// TODO phir durch sliderwert festlegen
+    		System.out.println("Slider Value: "+sliderPhirValue);
+    		switch(sliderPhirValue){
+    		case 0:
+    				phir=Math.PI*76.3/180;
+    			break;
+    		case 1:
+    				phir=Math.PI*65.5/180;
+    			break;
+    		case 2:
+    			   phir=Math.PI*51.5/180;			
+    			break;
+    		case 3:
+    			phir=Math.PI/4;
+    			break;
+    		}
     		
     		// Start Calculations
     		smartLoopModel.setAnzahlPunkte(1000);
@@ -92,6 +106,7 @@ public class Controller implements Runnable {
     public void clearPressed(){
     	smartLoopModel.removeRegelkreis();
     	smartLoopView.setState(View.initState);
+    	smartLoopView.updateConsole("Neue Werte können eingegeben werden...");
     }
     
     public void krUpdated(int newValue){
@@ -120,20 +135,25 @@ public class Controller implements Runnable {
      * @return
      */
     private boolean validateValues(double tuValue, double tgValue, double kValue, boolean pidState, boolean piState){
-    	double v = tuValue / tgValue;
+    	double v=0;
+    	if(tgValue!=0) {
+    		v = tuValue / tgValue;
+    	}
+    	
 		if ( v > 0.64173) {
-			System.out.println("Tu/Tg too great --> N would be greater than 8");
+			smartLoopView.updateConsole("Tu/Tg too great --> N would be greater than 8");
 			return false;
 		}
 		else if (v < 0.001) {
-			System.out.println("Tu/Tg too small --> N would be less than 1");
+			smartLoopView.updateConsole("Tu/Tg too small --> N would be less than 1");
 			return false;
 		}
-		if (kValue < 0){
-			System.out.println("k must be positive");
+		if (kValue < 0) {
+			smartLoopView.updateConsole("k must be positive");
 			return false;
 		}
-		if (! pidState ^ piState){
+		if (! pidState ^ piState) {
+			smartLoopView.updateConsole("Bitte einen Regelertyp auswählen");
 			return false;
 		}
 		return true;
