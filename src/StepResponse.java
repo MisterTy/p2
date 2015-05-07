@@ -83,31 +83,37 @@ public class StepResponse {
 	public void  schrittIfft(){
 		double [] freqAchse = new double[n/2];
 		double abtastRate = 1/fs;
-		Complex []tempH = new Complex[n];		//Temporärer ordner für symetrischen Vektor für iff
-		Complex []impulsA = new Complex[n];		//Impulsantwort
+		Complex []symVekt = new Complex[n];		//Symetrischen Vektor
+		Complex []impulsAComp = new Complex[n];		//Impulsantwort
+		double []impulsA= new double[n];		//Impulsantwort
+		double [] yAxisTmp;
+
 		
 		freqAchse = MathLibrary.linspace(0, fs*Math.PI, (n/2));
 		
-		Complex[] H = MathLibrary.freqs(b, a, freqAchse);
+		Complex[] freqG = MathLibrary.freqs(b, a, freqAchse);	//Frequenzgang
 		
 		for (int i = 0; i < n/2; i++) {			//Erster Teil des sym. Vektors
-			tempH[i]= H[i];
+			symVekt[i]= freqG[i];
 		}
-		tempH[n/2] = Complex.ZERO; 				// Mitte sym. Vektor
+		symVekt[n/2] = Complex.ZERO; 			// Mitte sym. Vektor
 		for (int i = n-1; i > n/2; i--) {	 	//Zweiter Teil des sym. Vektors
-			tempH[i]= H[i];
+			symVekt[i]= freqG[i];
 		}
+		//Impulsantwort
 		FastFourierTransformer mytransformer = new FastFourierTransformer(DftNormalization.STANDARD);
-		impulsA = mytransformer.transform(H, TransformType.INVERSE);
-
-		yAxis = MathArrays.convolve(arg0, arg1)
-		
-		
-		
-		
-		
-		
-		
+		impulsAComp = mytransformer.transform(freqG, TransformType.INVERSE);		
+		for (int i = 0; i < impulsAComp.length; i++) {
+			impulsA[i]=impulsAComp[i].abs();				
+		}
+		//Schrittantwort
+		yAxisTmp = MathArrays.convolve(impulsA, MathLibrary.ones(n+1));
+		for (int i = 0; i < yAxisTmp.length/2; i++) {	//Resultat ausschneiden
+			this.yAxis = yAxisTmp;
+		}
+		//Zeitachse
+		this.tAxis = MathLibrary.linspace(0, (this.yAxis.length-1)*abtastRate, this.yAxis.length);
+			
 	}
 	
 	
