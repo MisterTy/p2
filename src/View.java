@@ -382,8 +382,9 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 	public void updateConsole(String text){
 		tfKonsole.setText(text);
 	}
-	
+	 
 	public void updatePlot(XYSeries data){
+		dataset.removeAllSeries();
 		
 		if(dataset.getSeriesIndex("Schrittantwort")==-1)dataset.addSeries(data);
 		else{

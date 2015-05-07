@@ -80,14 +80,12 @@ public class Controller implements Runnable {
     		smartLoopModel.addRegelkreis(type);
     		
     		smartLoopModel.output();
+    		
 			//TODO Schrittantwort aus Werten berechnen
 			//TODO plot() mit daten aus Schrittantwort
-			
-    		double[] a=new double[100];
-    		double[] b=MathLibrary.linspace(0, 2*Math.PI);
-    		for (int i = 0; i < a.length; i++) a[i]=Math.sin(b[i]);
     		
-			plot(b,a);
+    		addplot(smartLoopModel.getXValues(), smartLoopModel.getYValues());
+
 
     		
     		// Update Modificaiton Fields
@@ -169,8 +167,9 @@ public class Controller implements Runnable {
 		}
 		return true;
     }
+ 
     
-    private void plot(double[] xValues,double[] yValues){
+    private void addplot(double[] xValues,double[] yValues){
     	XYSeries schrittantwort=new XYSeries("Schrittantwort");
     	for (int i = 0; i < xValues.length; i++) {
     		schrittantwort.add(xValues[i], yValues[i]);    		

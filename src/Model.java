@@ -76,6 +76,13 @@ public class Model extends Observable {
     	}
     }
     
+    public double[] getXValues(){
+		return regelKreisListe.get(0).getXValues();    	
+    }
+    
+    public double[] getYValues(){
+		return regelKreisListe.get(0).getYValues();    	
+    }
 
 
 
