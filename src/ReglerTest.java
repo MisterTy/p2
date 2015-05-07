@@ -18,10 +18,13 @@ public class ReglerTest extends JFrame{
 
 	public static void main(String[] args) {
 		
-		double[] a={9,5,6};
-		double[] b={1,0,1};
-		double[] w={5,6,7,8,9};
-		System.out.println(Arrays.toString(MathLibrary.freqs(a, b, w)));
+		double[] a={1,2,3};
+		double[] b={1,2};
+
+		
+		Complex[] c=MathLibrary.freqs(a, b, MathLibrary.linspace(1, 6,5));
+		System.out.println(Arrays.toString(c));
+		
 		
 		double[] antwort=null;
 
@@ -32,6 +35,7 @@ public class ReglerTest extends JFrame{
     	
     	
        	antwort=Phasengangmethode(MathLibrary.logspace(Math.log10(1/(Tmax*10)),Math.log10(1/(Tmin/10)),anzahlPunkte),ks,Math.PI/4);
+    	System.out.println("Ausgabe: "+Arrays.toString(antwort));
     	
     	
     	

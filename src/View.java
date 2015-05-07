@@ -106,9 +106,10 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 	private JTextField tfKonsole =new JTextField("Konsole...");
 	private JPanel panelLegende=new JPanel();
 	
+    XYSeriesCollection dataset = new XYSeriesCollection();
+	
 	private Controller actionHandler;
 	
-
 	
 	public View() {
 
@@ -147,28 +148,14 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 //*****************************************************************************		
 
         
-        XYSeriesCollection dataset = new XYSeriesCollection();
-        
-        XYSeries leer= new XYSeries("");
-        
-        
-        
-        
-        XYSeries sinus = new XYSeries("SINUS");
 
-     
-        for(double i=0; i<4*Math.PI+0.1 ;i=i+0.1){
-        	sinus.add(i,Math.sin(i));
-        }
-             
-        dataset.addSeries(leer);
         
         JFreeChart chart = ChartFactory.createXYLineChart("Test", "X", "Y", dataset);
  //     chart.removeLegend();
         
         ChartPanel chartPanel = new ChartPanel(chart);
         
-        chartPanel.setMouseWheelEnabled(true);
+//        chartPanel.setMouseWheelEnabled(true);
       
 
 //--------------------------------------------------------------------------------------
@@ -394,6 +381,14 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 	}
 	public void updateConsole(String text){
 		tfKonsole.setText(text);
+	}
+	
+	public void updatePlot(XYSeries data){
+		
+		if(dataset.getSeriesIndex("Schrittantwort")==-1)dataset.addSeries(data);
+		else{
+			System.out.println("SA Plot scho vorhanden");
+		}
 	}
 	
 	
