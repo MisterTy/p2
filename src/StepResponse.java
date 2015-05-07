@@ -30,10 +30,11 @@ public class StepResponse {
 		double [] bR;
 		
 		
-		aST = new double[zeitKonstantenStrecke.length][2]; 			//Speicher die Terme (1+sT1)(1+sT2)(1+sT3).....(1+sTn)  
-		tmp  = aST[0];												//erster Term (1+sT1)
-		System.out.println("aST[0]: "+Arrays.toString(tmp));
-		for (int i = 1; i < zeitKonstantenStrecke.length; i++) {
+		aST = new double[zeitKonstantenStrecke.length][2]; 			//Speicher die Terme (1+sT1)(1+sT2)(1+sT3).....(1+sTn)
+		tmp = new double[1];
+		tmp[0] = 1;
+		System.out.println("tmp: "+Arrays.toString(tmp));
+		for (int i = 0; i < zeitKonstantenStrecke.length; i++) {
 			aST[i][0] = zeitKonstantenStrecke[i];
 			aST[i][1] = 1;
 			tmp = MathArrays.convolve(tmp, aST[i]);					//(1+sT1)(1+sT2)(1+sT3).....(1+sTn) falten
@@ -76,14 +77,14 @@ public class StepResponse {
 		
 		
 		//A(s) = A(s) + B(s)
-		System.out.println("a: "+Arrays.toString(a)+" b: "+Arrays.toString(b));
 		for (int i = 0; i < a.length; i++) {
-			if (i<=a.length-b.length){
+			if (i<a.length-b.length){
 				a[i] = a[i];
 			} else {
 				a[i] = a[i]+b[i-(a.length-b.length)];
 			}
 		}
+		System.out.println("a: "+Arrays.toString(a)+" b: "+Arrays.toString(b));
 		
 		//Vorebereitung f�r FFT
 		fs = kreisFrequenzspektrum[kreisFrequenzspektrum.length-1];	//fs als max. Kreisfrequenz des w-Arrays gew�hlt
@@ -103,19 +104,19 @@ public class StepResponse {
 
 		
 		freqAchse = MathLibrary.linspace(0, fs*Math.PI, (n/2));
-		System.out.println("freqAchse: "+Arrays.toString(freqAchse));
+		//System.out.println("freqAchse: "+Arrays.toString(freqAchse));
 		
 		Complex[] freqG = MathLibrary.freqs(b, a, freqAchse);	//Frequenzgang
-		System.out.println("freqG: "+Arrays.toString(freqG));
+		//System.out.println("freqG: "+Arrays.toString(freqG));
 		
 		for (int i = 0; i < n/2; i++) {			//Erster Teil des sym. Vektors
 			symVekt[i]= freqG[i];
 		}
 		symVekt[n/2] = Complex.ZERO; 			// Mitte sym. Vektor
 		for (int i = n-1; i > n/2; i--) {	 	//Zweiter Teil des sym. Vektors
-			symVekt[i]= freqG[i-n/2];
+			symVekt[i]= freqG[n-i];
 		}
-		
+		System.out.println("symVek: "+Arrays.toString(symVekt));
 		// symVekt padden für FFT
 		//symVekt = MathLibrary.prepareForFFT(symVekt);
 		
@@ -127,13 +128,13 @@ public class StepResponse {
 		System.out.println("impulsAComp length: "+impulsAComp.length+" impulsA length: "+impulsA.length);
 		
 		for (int i = 0; i < n; i++) { // Durchläuft bis n, da zuvor gepaddete Werte abgschnitten werden sollen
-			impulsA[i]=impulsAComp[i].abs();				
+			impulsA[i]=impulsAComp[i].getReal();				
 		}
 		//Schrittantwort
 		yAxisTmp = MathArrays.convolve(impulsA, MathLibrary.ones(n+1));
-		System.out.println("impulsAComp: "+Arrays.toString(impulsAComp));
-		this.yAxis = new double[yAxisTmp.length/2];
-		for (int i = 0; i < yAxisTmp.length/2; i++) {	//Resultat ausschneiden
+		System.out.println("impulsA: "+Arrays.toString(impulsA));
+		this.yAxis = new double[yAxisTmp.length/4];
+		for (int i = 0; i < yAxis.length; i++) {	//Resultat ausschneiden
 			this.yAxis[i] = yAxisTmp[i];
 		}
 		//Zeitachse
