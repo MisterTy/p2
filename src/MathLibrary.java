@@ -2,6 +2,7 @@
 import java.util.*;
 
 import org.apache.commons.math3.complex.Complex;
+import org.apache.commons.math3.util.FastMath;
 
 /**
  * 
@@ -116,17 +117,22 @@ public class MathLibrary {
 
 		for (int k = 0; k < res.length; k++) {
 			Complex jw = new Complex(0,w[k]);
+			
+			if (jw.equals(Complex.ZERO)){		// für omega==0 
+				System.out.println("Konstante Paras: "+b[b.length-1]+"\t"+a[a.length-1]);
+				res[k] = new Complex(b[b.length-1] / a[a.length-1], 0);
+			} else {
+				Complex zaehler = new Complex(0, 0);
+				for (int i = 0; i < b.length; i++) {
+					zaehler = zaehler.add(jw.pow(b.length - i - 1).multiply(b[i]));
+				}
 
-			Complex zaehler = new Complex(0, 0);
-			for (int i = 0; i < b.length; i++) {
-				zaehler = zaehler.add(jw.pow(b.length - i - 1).multiply(b[i]));
+				Complex nenner = new Complex(0, 0);
+				for (int i = 0; i < a.length; i++) {
+					nenner = nenner.add(jw.pow(a.length - i - 1).multiply(a[i]));
+				}
+				res[k] = zaehler.divide(nenner);
 			}
-
-			Complex nenner = new Complex(0, 0);
-			for (int i = 0; i < a.length; i++) {
-				nenner = nenner.add(jw.pow(a.length - i - 1).multiply(a[i]));
-			}
-			res[k] = zaehler.divide(nenner);
 		}
 		return res;
 	}
@@ -143,6 +149,25 @@ public class MathLibrary {
 			result[i] = 1;
 		}
 		return result;
+	}
+	
+	public static Complex[] prepareForFFT(Complex[] fftVector){
+		int oldLength = fftVector.length;
+		int newLength = (int) Math.pow(2, FastMath.ceil(FastMath.log(2.0, oldLength)));
+		Complex[] result = new Complex[newLength];
+		for (int i=0; i<newLength; i++){
+			if (i<fftVector.length){
+				result[i] = fftVector[i];
+			} else {
+				result[i] = Complex.ZERO;
+			}
+		}
+		return result;
+	}
+	
+	public static int makePowOf2(int oldValue){
+		System.out.println("oldValue: "+oldValue+" newValue: "+(int) Math.pow(2, FastMath.ceil(FastMath.log(2.0, oldValue))));
+		return (int) Math.pow(2, FastMath.ceil(FastMath.log(2.0, oldValue)));
 	}
 
 	

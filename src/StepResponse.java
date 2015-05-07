@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
@@ -7,7 +9,7 @@ import org.apache.commons.math3.util.MathArrays;
 
 public class StepResponse {
 	
-	//a = Zählerpolynom/b=Reglerpolynom/S= Strecke/R=Regler/T=Terme
+	//a = Zï¿½hlerpolynom/b=Reglerpolynom/S= Strecke/R=Regler/T=Terme
 	private double [] a;
 	private double [] b;
 	private double [] yAxis;
@@ -30,15 +32,19 @@ public class StepResponse {
 		
 		aST = new double[zeitKonstantenStrecke.length][2]; 			//Speicher die Terme (1+sT1)(1+sT2)(1+sT3).....(1+sTn)  
 		tmp  = aST[0];												//erster Term (1+sT1)
+		System.out.println("aST[0]: "+Arrays.toString(tmp));
 		for (int i = 1; i < zeitKonstantenStrecke.length; i++) {
+			aST[i][0] = zeitKonstantenStrecke[i];
+			aST[i][1] = 1;
 			tmp = MathArrays.convolve(tmp, aST[i]);					//(1+sT1)(1+sT2)(1+sT3).....(1+sTn) falten
+			System.out.println("aST["+i+"]: "+Arrays.toString(aST[i])+" tmp: "+Arrays.toString(tmp));
 		}
 		aS= tmp;				//Nennerpolyonom Strecke
-		bS[0] = streckenbeiwert;	//Zählerpolyonom Strecke	
+		bS[0] = streckenbeiwert;	//Zï¿½hlerpolyonom Strecke	
 		
 		switch (type){	
 		case Model.piRegler:
-			bR = new double[2];			// Zählerpoly = s*kR*Tn+kR
+			bR = new double[2];			// Zï¿½hlerpoly = s*kR*Tn+kR
 			bR[1] = reglerParameter[0];	//kR
 			bR[0] = reglerParameter[0]*reglerParameter[1]; //s*kR*Tn
 			
@@ -50,7 +56,7 @@ public class StepResponse {
 			break;
 			
 		case Model.pidRegler:
-			bR = new double[3];			// Zählerpoly =s^2*kR*(Tn*Tp+Tn*Tv) + s*kR*(Tn+Tp) + kR]
+			bR = new double[3];			// Zï¿½hlerpoly =s^2*kR*(Tn*Tp+Tn*Tv) + s*kR*(Tn+Tp) + kR]
 			bR[2] = reglerParameter[0];	//kR
 			bR[1] = reglerParameter[0]*(reglerParameter[1]+reglerParameter[3]); //s*kR*(Tn+Tp)
 			bR[0] = reglerParameter[0]*reglerParameter[1]*(reglerParameter[3]+reglerParameter[2]); //s^2*kR*Tn*(Tp+Tv)
@@ -61,20 +67,27 @@ public class StepResponse {
 			aR[0] = reglerParameter[1]*reglerParameter[3]; //s^2*Tn*Tp
 			this.b = MathArrays.convolve(bS, bR);// B(s)
 			this.a = MathArrays.convolve(aS, aR);// A(s)
+			System.out.println("aR: "+Arrays.toString(aR)+" aS: "+Arrays.toString(aS));
+			System.out.println("bR: "+Arrays.toString(bR)+" bS: "+Arrays.toString(bS));
 			break;
 		}
 		
+		
+		
+		
 		//A(s) = A(s) + B(s)
+		System.out.println("a: "+Arrays.toString(a)+" b: "+Arrays.toString(b));
 		for (int i = 0; i < a.length; i++) {
-			a[i]= a[i];
-			if (i>b.length){
-				a[i] = a[i]+b[i-b.length];
+			if (i<=a.length-b.length){
+				a[i] = a[i];
+			} else {
+				a[i] = a[i]+b[i-(a.length-b.length)];
 			}
 		}
 		
-		//Vorebereitung für FFT
-		fs = kreisFrequenzspektrum[kreisFrequenzspektrum.length];	//fs als max. Kreisfrequenz des w-Arrays gewählt
-		n = kreisFrequenzspektrum.length; 
+		//Vorebereitung fï¿½r FFT
+		fs = kreisFrequenzspektrum[kreisFrequenzspektrum.length-1];	//fs als max. Kreisfrequenz des w-Arrays gewï¿½hlt
+		n = MathLibrary.makePowOf2(kreisFrequenzspektrum.length); 
 		this.schrittIfft();
 		
 		
@@ -90,29 +103,42 @@ public class StepResponse {
 
 		
 		freqAchse = MathLibrary.linspace(0, fs*Math.PI, (n/2));
+		System.out.println("freqAchse: "+Arrays.toString(freqAchse));
 		
 		Complex[] freqG = MathLibrary.freqs(b, a, freqAchse);	//Frequenzgang
+		System.out.println("freqG: "+Arrays.toString(freqG));
 		
 		for (int i = 0; i < n/2; i++) {			//Erster Teil des sym. Vektors
 			symVekt[i]= freqG[i];
 		}
 		symVekt[n/2] = Complex.ZERO; 			// Mitte sym. Vektor
 		for (int i = n-1; i > n/2; i--) {	 	//Zweiter Teil des sym. Vektors
-			symVekt[i]= freqG[i];
+			symVekt[i]= freqG[i-n/2];
 		}
+		
+		// symVekt padden fÃ¼r FFT
+		//symVekt = MathLibrary.prepareForFFT(symVekt);
+		
+		//System.out.println("SymVek prepared: "+Arrays.toString(symVekt));
+		
 		//Impulsantwort
 		FastFourierTransformer mytransformer = new FastFourierTransformer(DftNormalization.STANDARD);
-		impulsAComp = mytransformer.transform(freqG, TransformType.INVERSE);		
-		for (int i = 0; i < impulsAComp.length; i++) {
+		impulsAComp = mytransformer.transform(symVekt, TransformType.INVERSE);	
+		System.out.println("impulsAComp length: "+impulsAComp.length+" impulsA length: "+impulsA.length);
+		
+		for (int i = 0; i < n; i++) { // DurchlÃ¤uft bis n, da zuvor gepaddete Werte abgschnitten werden sollen
 			impulsA[i]=impulsAComp[i].abs();				
 		}
 		//Schrittantwort
 		yAxisTmp = MathArrays.convolve(impulsA, MathLibrary.ones(n+1));
+		System.out.println("impulsAComp: "+Arrays.toString(impulsAComp));
+		this.yAxis = new double[yAxisTmp.length/2];
 		for (int i = 0; i < yAxisTmp.length/2; i++) {	//Resultat ausschneiden
-			this.yAxis = yAxisTmp;
+			this.yAxis[i] = yAxisTmp[i];
 		}
 		//Zeitachse
 		this.tAxis = MathLibrary.linspace(0, (this.yAxis.length-1)*abtastRate, this.yAxis.length);
+		System.out.println("yAxis length: "+yAxis.length+" tAxis length: "+tAxis.length);
 			
 	}
 	
