@@ -7,14 +7,6 @@ import org.apache.commons.math3.complex.Complex;
  * 
  */
 public class MathLibrary {
-
-    /**
-     * 
-     */
-    public MathLibrary() {
-    	
-    	
-    }
     
     /**
      * Methode sucht index eines Punktes (Phi) aus einem Double Array (phase).
@@ -111,7 +103,7 @@ public class MathLibrary {
 
 			Complex zaehler = new Complex(0, 0);
 			for (int i = 0; i < b.length; i++) {
-				zaehler = zaehler.add(jw.pow( b.length - i - 1).multiply(b[i]));
+				zaehler = zaehler.add(jw.pow(b.length - i - 1).multiply(b[i]));
 			}
 
 			Complex nenner = new Complex(0, 0);
@@ -121,6 +113,14 @@ public class MathLibrary {
 			res[k] = zaehler.divide(nenner);
 		}
 		return res;
+	}
+	
+	public static double[] ones(int anzSpalten){
+		double[] result = new double[anzSpalten];
+		for (int i=0; i<anzSpalten; i++){
+			result[i] = 1;
+		}
+		return result;
 	}
 
 }
