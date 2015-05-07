@@ -135,8 +135,9 @@ public class StepResponse {
 		System.out.println("impulsA: "+Arrays.toString(impulsA));
 		this.yAxis = new double[yAxisTmp.length/4];
 		for (int i = 0; i < yAxis.length; i++) {	//Resultat ausschneiden
-			this.yAxis[i] = yAxisTmp[i];
+			this.yAxis[i] = yAxisTmp[i] + yAxisTmp[yAxisTmp.length-i-1];
 		}
+		
 		//Zeitachse
 		this.tAxis = MathLibrary.linspace(0, (this.yAxis.length-1)*abtastRate, this.yAxis.length);
 		System.out.println("yAxis length: "+yAxis.length+" tAxis length: "+tAxis.length);
