@@ -32,7 +32,7 @@ public class MathLibrary {
     }
     
     /**
-     * Gibt eine linear unterteilte Werteliste als Double Array zurück mit n Punkten
+     * Gibt eine linear unterteilte Werteliste als Double Array zurück, mit n Punkten
      * @param start
      * @param end
      * @param n
@@ -82,19 +82,35 @@ public class MathLibrary {
 		return space;
     	
     }
-    
+    /**
+     * Sucht den groessten Wert aus einem Array und gibt diesen zurück
+     * 
+     * @param werte
+     * @return Maximalwert
+     */
 	public static double findMax(double[] werte){
 		double maximalwert=werte[0];
 		for (int i = 0; i < werte.length; i++) if(werte[i]>maximalwert)maximalwert=werte[i];
 		return maximalwert;
 	}
-	
+	/**
+	 * Sucht den kleinsten Wert aus einem Array und gibt diesen zurück
+	 * @param werte
+	 * @return
+	 */
 	public static double findMin(double[] werte){
 		double maximalwert=werte[0];
 		for (int i = 0; i < werte.length; i++) if(werte[i]<maximalwert)maximalwert=werte[i];
 		return maximalwert;
 	}
 	
+	/**
+	 * Berechnet den Frequenzgang aus Zaehler und Nennerpolynom und gibt diesen zurück
+	 * @param b
+	 * @param a
+	 * @param w
+	 * @return Frequenzgang
+	 */
 	public static final Complex[] freqs(double[] b, double[] a, double[] w) {
 		Complex[] res = new Complex[w.length];
 
@@ -115,6 +131,12 @@ public class MathLibrary {
 		return res;
 	}
 	
+	/**
+	 * Erzeugt ein eindimesionales Array, jeweils gefüllt mit dem Wert 1.
+	 * 
+	 * @param anzSpalten
+	 * @return EinerArray
+	 */
 	public static double[] ones(int anzSpalten){
 		double[] result = new double[anzSpalten];
 		for (int i=0; i<anzSpalten; i++){
@@ -123,4 +145,5 @@ public class MathLibrary {
 		return result;
 	}
 
+	
 }
