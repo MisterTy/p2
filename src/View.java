@@ -12,6 +12,8 @@ import java.awt.Polygon;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -51,7 +53,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 
 
-public class View extends JPanel implements Observer, ActionListener, ChangeListener {
+public class View extends JPanel implements Observer, ActionListener, ChangeListener, FocusListener {
 	static final int initState = 1;
 	static final int calculatingState = 2;
 	static final int modifyPIDState = 3;
@@ -91,16 +93,16 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 	private JSlider sliderPhir = new JSlider(0,3,0);
 	
 	private JLabel lbKr=new JLabel("Kr: ");
-	private JTextField tfKr =new JTextField("");
+	private JFormattedDoubleTextField tfKr =new JFormattedDoubleTextField(0);
 	private JSlider sliderKr =new JSlider(0,100000,50000);
 	private JLabel lbTn=new JLabel("Tn: ");
-	private JTextField tfTn =new JTextField("");
+	private JFormattedDoubleTextField tfTn =new JFormattedDoubleTextField(0);
 	private JSlider sliderTn =new JSlider(0,100000,50000);
 	private JLabel lbTv=new JLabel("Tv: ");
-	private JTextField tfTv =new JTextField("");
+	private JFormattedDoubleTextField tfTv =new JFormattedDoubleTextField(0);
 	private JSlider sliderTv =new JSlider(0,100000,50000);
 	private JLabel lbTp=new JLabel("Tp: ");
-	private JTextField tfTp =new JTextField("");
+	private JFormattedDoubleTextField tfTp =new JFormattedDoubleTextField(0);
 	private JSlider sliderTp =new JSlider(0,100000,50000);
 	
 	
@@ -272,8 +274,14 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 		panel3.add(tfTp, new GridBagConstraints(1, 7, 1, 1, 0.0, 0.0,
 				GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,ins1, 0, 0));
 
-
-		
+		tfKr.addFocusListener(this);
+		tfTn.addFocusListener(this);
+		tfTv.addFocusListener(this);
+		tfTp.addFocusListener(this);
+		tfKr.addActionListener(this);
+		tfTn.addActionListener(this);
+		tfTv.addActionListener(this);
+		tfTp.addActionListener(this);
 		
 		tfKonsole.setEditable(false);
 				
@@ -300,6 +308,15 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 		
 		setState(initState);
 	
+		//Demo Werte Strecke 1:
+		
+		tfTu.setValue(3.08);
+		tfTg.setValue(30.8);
+		tfk.setValue(0.5);
+		btPID.setSelected(true);
+		sliderPhir.setValue(3);
+		
+		
 	}
 
 
@@ -312,13 +329,19 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 		} else if (eventSource == btClear){
 //			dataset.removeAllSeries();
 			actionHandler.clearPressed();
+		} else if(eventSource==tfKr||eventSource==tfTn||eventSource==tfTv||eventSource==tfTp){
+			double[] eingabe=new double[4];
+			eingabe[0]=Double.parseDouble(tfKr.getText());
+			eingabe[1]=Double.parseDouble(tfTn.getText());
+			eingabe[2]=Double.parseDouble(tfTv.getText());
+			eingabe[3]=Double.parseDouble(tfTp.getText());
+			actionHandler.tfValuesChanged(eingabe);
 		}
 	}
 	
 	public void stateChanged(ChangeEvent e){
 		Object eventSource = e.getSource();
-		if (eventSource == sliderKr){
-			
+		if (eventSource == sliderKr){			
 			actionHandler.krUpdated(sliderKr.getValue());
 		} else if (eventSource == sliderTn) {
 			actionHandler.tnUpdated(sliderTn.getValue());
@@ -329,6 +352,15 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 		} else if(eventSource==sliderPhir) {
 			
 		}
+	}
+	
+	public void focusLost(FocusEvent e) {
+		double[] eingabe=new double[4];
+		eingabe[0]=Double.parseDouble(tfKr.getText());
+		eingabe[1]=Double.parseDouble(tfTn.getText());
+		eingabe[2]=Double.parseDouble(tfTv.getText());
+		eingabe[3]=Double.parseDouble(tfTp.getText());
+		actionHandler.tfValuesChanged(eingabe);
 	}
 	
 	public void setActionHandler(Controller actionHandler){
@@ -356,33 +388,19 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 				updateTf = tfTp;
 				break;
 		}
-		if (updateSlider.getValue() != newValue.intValue() * 1000){
+		if (updateSlider.getValue() != newValue.intValue()* 1000){
 			updateTf.setText(String.format(numFormat, newValue));
-			updateSlider.setValue(newValue.intValue() * 1000);
+			updateSlider.setValue((int)(newValue * 1000.0));
 		}
 	}	
-	public void updateKr(Double kr){
-		System.out.println("halllooooo: "+(int)(2.0*1000.0*kr.floatValue()));
-		sliderKr.setMaximum((int)(2.0*1000.0*kr.floatValue()));
-		if (sliderKr.getValue() != kr.floatValue() * 1000.0){
-			tfKr.setText(String.format(numFormat, kr));
-			sliderKr.setValue((int)(kr.floatValue() * 1000.0));
-		}
+	
+	public void updateSliderMaxValues(double[] MaxValues){
+		sliderKr.setMaximum((int)(MaxValues[0]*2000.0));
+		sliderTn.setMaximum((int)(MaxValues[1]*2000.0));
+		sliderTv.setMaximum((int)(MaxValues[2]*2000.0));
+		sliderTp.setMaximum((int)(MaxValues[3]*2000.0));
 	}
-	public void updateTn(Double tn){
-		if (sliderTn.getValue() != tn.intValue() * 1000){
-			tfTn.setText(String.format(numFormat, tn));
-			sliderTn.setValue(tn.intValue() * 1000);
-		}
-	}
-	public void updateTv(Double tv){
-		tfTv.setText(String.format(numFormat, tv));
-		sliderTv.setValue(tv.intValue() * 1000);
-	}
-	public void updateTp(Double tp){
-		tfTp.setText(String.format(numFormat, tp));
-		sliderTp.setValue(tp.intValue() * 1000);
-	}
+	
 	public void updateConsole(String text){
 		tfKonsole.setText(text);
 	}
@@ -398,6 +416,10 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 			System.out.println("SA Plot schon vorhanden");
 		}
 		
+	}
+	
+	public int getState(){
+		return state;
 	}
 	
 	
@@ -481,4 +503,13 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 				break;
 		}
 	}
+
+
+
+	@Override
+	public void focusGained(FocusEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

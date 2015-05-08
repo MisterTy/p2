@@ -91,20 +91,20 @@ public class Controller implements Runnable {
 
     		
     		// Update Modificaiton Fields
+    		smartLoopView.updateSliderMaxValues(smartLoopModel.getResult());
     		double[] result = smartLoopModel.getResult();
     		if (type == Model.piRegler){
     			smartLoopView.setState(View.modifyPIState);
-    			smartLoopView.updateKr(result[0]);
-    			smartLoopView.updateTn(result[1]);
-    			smartLoopView.updateTv(0.0);
-    			smartLoopView.updateTp(0.0);
-    			
+    			smartLoopView.updateParam(result[0], "kr");
+    			smartLoopView.updateParam(result[1], "tn");
+    			smartLoopView.updateParam(0.0, "tv");
+    			smartLoopView.updateParam(0.0, "tp");
     		} else {
     			smartLoopView.setState(View.modifyPIDState);
-    			smartLoopView.updateKr(result[0]);
-    			smartLoopView.updateTn(result[1]);
-    			smartLoopView.updateTv(result[2]);
-    			smartLoopView.updateTp(result[3]);
+    			smartLoopView.updateParam(result[0], "kr");
+    			smartLoopView.updateParam(result[1], "tn");
+    			smartLoopView.updateParam(result[2], "tv");
+    			smartLoopView.updateParam(result[3], "tp");
     		}
     		
     		
@@ -121,18 +121,28 @@ public class Controller implements Runnable {
     }
     
     public void krUpdated(int newValue){
-    	smartLoopView.updateParam(newValue / 1000.0, "kr");
+    	smartLoopView.updateParam((float)newValue / 1000.0, "kr");
     }
     public void tnUpdated(int newValue){
-    	smartLoopView.updateParam(newValue / 1000.0, "tn");
+    	smartLoopView.updateParam((float)newValue / 1000.0, "tn");
     }
     public void tvUpdated(int newValue){
-    	smartLoopView.updateParam(newValue / 1000.0, "tv");
+    	smartLoopView.updateParam((float)newValue / 1000.0, "tv");
     }
     public void tpUpdated(int newValue){
-    	smartLoopView.updateParam(newValue / 1000.0, "tp");
+    	smartLoopView.updateParam((float)newValue / 1000.0, "tp");
     }
     
+    public void tfValuesChanged(double[] tfValues){
+    	smartLoopView.updateSliderMaxValues(tfValues);   
+    	
+    	krUpdated((int)(tfValues[0]*1000.0));
+    	tnUpdated((int)(tfValues[1]*1000.0));
+    	if(smartLoopView.getState()==smartLoopView.modifyPIDState){
+    		tvUpdated((int)(tfValues[2]*1000.0));
+			tpUpdated((int)(tfValues[3]*1000.0));
+    	}    		
+    }
     /**
      * ��berpr��ft ob die Werte f��r Tu, Tg und k plausibel sind.
      * Getestet wird:
