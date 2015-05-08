@@ -114,7 +114,7 @@ public class StepResponse {
 		}
 		symVekt[n/2] = Complex.ZERO; 			// Mitte sym. Vektor
 		for (int i = n-1; i > n/2; i--) {	 	//Zweiter Teil des sym. Vektors
-			symVekt[i]= freqG[n-i];
+			symVekt[i]= freqG[n-i].conjugate();
 		}
 		System.out.println("symVek: "+Arrays.toString(symVekt));
 		// symVekt padden für FFT
@@ -131,13 +131,11 @@ public class StepResponse {
 			impulsA[i]=impulsAComp[i].getReal();				
 		}
 		//Schrittantwort
-		yAxisTmp = MathArrays.convolve(impulsA, MathLibrary.ones(n+1));
-		System.out.println("impulsA: "+Arrays.toString(impulsA));
-		this.yAxis = new double[yAxisTmp.length/4];
-		for (int i = 0; i < yAxis.length; i++) {	//Resultat ausschneiden
-			this.yAxis[i] = yAxisTmp[i] + yAxisTmp[yAxisTmp.length-i-1];
+		this.yAxis = new double [impulsA.length];
+		for (int i = 1; i < impulsA.length; i++) {
+			this.yAxis[i]= this.yAxis[i-1]+impulsA[i];
 		}
-		
+
 		//Zeitachse
 		this.tAxis = MathLibrary.linspace(0, (this.yAxis.length-1)*abtastRate, this.yAxis.length);
 		System.out.println("yAxis length: "+yAxis.length+" tAxis length: "+tAxis.length);
