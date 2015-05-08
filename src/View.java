@@ -67,6 +67,7 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 	private JPanel 	panel4=new JPanel();
 	private JPanel 	panel5=new JPanel();
 	
+	private ChartPanel chartPanel;
 	
 	private JLabel lbTu=new JLabel("Tu: ");
 	private JEngineeringTextField tfTu =new JEngineeringTextField(0);
@@ -150,13 +151,14 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
         
 
         
-        JFreeChart chart = ChartFactory.createXYLineChart("Test", "X", "Y", dataset);
+        JFreeChart chart = ChartFactory.createXYLineChart(" ", "Zeit", "Amplitude", dataset);
  //     chart.removeLegend();
         
-        ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel = new ChartPanel(chart);
         
-//        chartPanel.setMouseWheelEnabled(true);
+        chartPanel.setMouseWheelEnabled(true);
       
+        
 
 //--------------------------------------------------------------------------------------
         
@@ -308,6 +310,7 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 		if (eventSource == btBerechnen){
 			actionHandler.berechnenPressed(tfTu.getValue(), tfTg.getValue(), tfk.getValue(), btPID.isSelected(), btPI.isSelected(),sliderPhir.getValue());
 		} else if (eventSource == btClear){
+//			dataset.removeAllSeries();
 			actionHandler.clearPressed();
 		}
 	}
@@ -357,12 +360,13 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 			updateTf.setText(String.format(numFormat, newValue));
 			updateSlider.setValue(newValue.intValue() * 1000);
 		}
-	}
-	
+	}	
 	public void updateKr(Double kr){
-		if (sliderKr.getValue() != kr.intValue() * 1000){
+		System.out.println("halllooooo: "+(int)(2.0*1000.0*kr.floatValue()));
+		sliderKr.setMaximum((int)(2.0*1000.0*kr.floatValue()));
+		if (sliderKr.getValue() != kr.floatValue() * 1000.0){
 			tfKr.setText(String.format(numFormat, kr));
-			sliderKr.setValue(kr.intValue() * 1000);
+			sliderKr.setValue((int)(kr.floatValue() * 1000.0));
 		}
 	}
 	public void updateTn(Double tn){
@@ -384,12 +388,16 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 	}
 	 
 	public void updatePlot(XYSeries data){
-		dataset.removeAllSeries();
+	//	dataset.removeAllSeries();
 		
-		if(dataset.getSeriesIndex("Schrittantwort")==-1)dataset.addSeries(data);
-		else{
-			System.out.println("SA Plot scho vorhanden");
+		if(dataset.getSeriesIndex("Schrittantwort")==-1){
+			dataset.addSeries(data);
+			chartPanel.restoreAutoBounds(); //Zoom zurücksetzen;
 		}
+		else{
+			System.out.println("SA Plot schon vorhanden");
+		}
+		
 	}
 	
 	

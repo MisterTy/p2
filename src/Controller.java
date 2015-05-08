@@ -13,6 +13,8 @@ import org.jfree.data.xy.XYSeries;
 public class Controller implements Runnable {
 	Model smartLoopModel;
 	View smartLoopView;
+	
+	int plotNummerierung=0;
 
     /**
      * @param model
@@ -170,7 +172,8 @@ public class Controller implements Runnable {
  
     
     private void addplot(double[] xValues,double[] yValues){
-    	XYSeries schrittantwort=new XYSeries("Schrittantwort");
+    	plotNummerierung++;
+    	XYSeries schrittantwort=new XYSeries("Schrittantwort"+plotNummerierung);
     	for (int i = 0; i < xValues.length; i++) {
     		schrittantwort.add(xValues[i], yValues[i]);    		
 		}
