@@ -35,7 +35,7 @@ public class Strecke {
 			
 		}
 		for (int i = 0; i < utfStrecke.length; i++){
-			utfStrecke[i]=utfStrecke[i].multiply(ks);		//Gs Liste komp.
+			utfStrecke[i]=utfStrecke[i].multiply(ks);		//Gs Liste komp. 
 		}
     	
     }

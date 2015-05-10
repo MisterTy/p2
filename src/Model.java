@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Observable;
 
 import org.apache.commons.math3.complex.Complex;
 
@@ -57,22 +58,25 @@ public class Model extends Observable {
     		case piRegler: case pidRegler:
     			Regelkreis regelkreis = new Regelkreis(type, utfStrecke, kreisFrequenzSpektrum, phasenrand, verstarkungStrecke, zeitkonstante);
     			regelKreisListe.add(regelkreis);
+    			setChanged();
+    			notifyObservers(regelkreis.getResult());
     			break;
     	}
+    }
+    
+    public void updateStepResponse(int regelkreis, double[] params){
+    	regelKreisListe.get(regelkreis).updateStepResponse(params, regelkreis, zeitkonstante, kreisFrequenzSpektrum);
+    	setChanged();
+    	notifyObservers(regelKreisListe.get(regelkreis).getResult());
     }
     
     public void removeRegelkreis(){
     	regelKreisListe.remove(0);
     }
     
-    public double[] getResult(){
-    	return regelKreisListe.get(0).regler.getResult();
-    }
-    
     public void output(){
     	for (Regelkreis regelkreis : regelKreisListe){
     		regelkreis.output();
-    		
     	}
     }
     
@@ -83,14 +87,4 @@ public class Model extends Observable {
     public double[] getYValues(){
 		return regelKreisListe.get(0).getYValues();    	
     }
-
-
-
-    /**
-     * 
-     */
-    public void notifyObservers() {
-        // TODO implement here
-    }
-
 }

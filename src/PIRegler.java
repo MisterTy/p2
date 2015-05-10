@@ -60,7 +60,7 @@ public class PIRegler extends GenericRegler {
     	tn=1/wpi;
    	
        	for (int i = 0; i < w.length; i++) {
-			grp[i]=(Complex.I.multiply(w[i]).multiply(tn)).reciprocal().add(1); //Übertragungsfkt PI Regeler mit kR=1
+			grp[i]=(Complex.I.multiply(w[i]).multiply(tn)).reciprocal().add(1); //��bertragungsfkt PI Regeler mit kR=1
 		}
  	}
     
@@ -99,7 +99,7 @@ public class PIRegler extends GenericRegler {
     	System.out.println("Tp:" +tp);
     }
     /**
-     * Führt die Berechnung des PI Reglers durch
+     * F��hrt die Berechnung des PI Reglers durch
      */
     public void compute(){
     	
@@ -113,10 +113,7 @@ public class PIRegler extends GenericRegler {
     	berechnungStrecke();
     	berechnungOffenerRegelkreis();
     	
-    	result[0] = kR;
-    	result[1] = tn;
-    	result[2] = tv;
-    	result[3] = tp;
+    	result.setValues(reglerTyp, kR, tn, tv, tp);
     }
     
     

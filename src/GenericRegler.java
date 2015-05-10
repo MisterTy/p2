@@ -8,7 +8,7 @@ import org.apache.commons.math3.complex.Complex;
  */
 public class GenericRegler {
 	public int reglerTyp = 0;
-	double[] result = new double[4];
+	DimensioningResult result = new DimensioningResult();
 	
 	Complex[] gs;
 	double[] w;
@@ -22,7 +22,7 @@ public class GenericRegler {
     public GenericRegler() {
     }
     
-    public double[] getResult(){
+    public DimensioningResult getResult(){
     	return result;
     }
     
@@ -68,6 +68,10 @@ public class GenericRegler {
     
     public void setT(double[] zeitkonstante){
     	t = zeitkonstante;
+    }
+    
+    public int getTyp(){
+    	return reglerTyp;
     }
 
 }

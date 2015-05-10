@@ -1,5 +1,7 @@
 
 import java.awt.Dimension;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.JFrame;
 import javax.swing.JRootPane;
@@ -10,9 +12,11 @@ import org.jfree.data.xy.XYSeries;
 /**
  * Verwaltet eingaben, die druch das View gemacht werden.
  */
-public class Controller implements Runnable {
+public class Controller implements Runnable, Observer {
 	Model smartLoopModel;
 	View smartLoopView;
+	
+	boolean initComplete = false;
 	
 	int plotNummerierung=0;
 
@@ -51,7 +55,7 @@ public class Controller implements Runnable {
     public void berechnenPressed(double tuValue, double tgValue, double kValue, boolean pidState, boolean piState, int sliderPhirValue){
     	if (validateValues(tuValue, tgValue, kValue, pidState, piState)){
     		smartLoopView.setState(View.calculatingState);
-    		smartLoopView.updateConsole("Berechnete Werte werden ausgeben");
+    		smartLoopView.updateConsole("Berechnung gestartet");
     		
     		int type = Model.pidRegler;
     		if (piState){
@@ -80,39 +84,39 @@ public class Controller implements Runnable {
     		smartLoopModel.setPhasenrand(phir);
     		smartLoopModel.setVerstarkung(kValue);
     		smartLoopModel.addRegelkreis(type);
-    		
-    		smartLoopModel.output();
-    		
-			//TODO Schrittantwort aus Werten berechnen
-			//TODO plot() mit daten aus Schrittantwort
-    		
-    		addplot(smartLoopModel.getXValues(), smartLoopModel.getYValues());
-
-
-    		
-    		// Update Modificaiton Fields
-    		smartLoopView.updateSliderMaxValues(smartLoopModel.getResult());
-    		double[] result = smartLoopModel.getResult();
-    		if (type == Model.piRegler){
-    			smartLoopView.setState(View.modifyPIState);
-    			smartLoopView.updateParam(result[0], "kr");
-    			smartLoopView.updateParam(result[1], "tn");
-    			smartLoopView.updateParam(0.0, "tv");
-    			smartLoopView.updateParam(0.0, "tp");
-    		} else {
-    			smartLoopView.setState(View.modifyPIDState);
-    			smartLoopView.updateParam(result[0], "kr");
-    			smartLoopView.updateParam(result[1], "tn");
-    			smartLoopView.updateParam(result[2], "tv");
-    			smartLoopView.updateParam(result[3], "tp");
-    		}
-    		
-    		
     	}
     	else{
     		System.out.println("Somthing is wrong with entered values...");
     	}
     }
+    
+    public void update(Observable sender, Object args){
+    	initComplete = false;
+    	smartLoopModel.output();
+    	smartLoopView.updateConsole("Berechnete Werte werden ausgegeben");
+    	
+    	DimensioningResult dimRes = (DimensioningResult) args;
+    	smartLoopModel.output();
+    	if (dimRes.getType() == Model.piRegler){
+			smartLoopView.setState(View.modifyPIState);
+			smartLoopView.updateParam(dimRes.getKr(), "kr");
+			smartLoopView.updateParam(dimRes.getTn(), "tn");
+			smartLoopView.updateParam(0.0, "tv");
+			smartLoopView.updateParam(0.0, "tp");
+		} else {
+			smartLoopView.setState(View.modifyPIDState);
+			smartLoopView.updateParam(dimRes.getKr(), "kr");
+			smartLoopView.updateParam(dimRes.getTn(), "tn");
+			smartLoopView.updateParam(dimRes.getTv(), "tv");
+			smartLoopView.updateParam(dimRes.getTp(), "tp");
+		}
+    	
+    	addplot(smartLoopModel.getXValues(), smartLoopModel.getYValues());
+    	smartLoopView.updateSliderMaxValues(dimRes.getParamArray());
+    	initComplete = true;
+    }
+    
+    
     
     public void clearPressed(){
     	smartLoopModel.removeRegelkreis();
@@ -120,15 +124,26 @@ public class Controller implements Runnable {
     	smartLoopView.updateConsole("Neue Werte können eingegeben werden...");
     }
     
+    public void paramUpdated(int newValue, String param, boolean recalc){
+    	smartLoopView.updateParam((float)newValue / 1000.0, param);
+    	if (recalc && initComplete) {
+    		smartLoopModel.updateStepResponse(0, smartLoopView.getParamValues());
+    	}
+    }
+    
+	// DEPRECIATED - DO NOT USE ANYMORE
     public void krUpdated(int newValue){
     	smartLoopView.updateParam((float)newValue / 1000.0, "kr");
     }
+    // DEPRECIATED - DO NOT USE ANYMORE
     public void tnUpdated(int newValue){
     	smartLoopView.updateParam((float)newValue / 1000.0, "tn");
     }
+    // DEPRECIATED - DO NOT USE ANYMORE
     public void tvUpdated(int newValue){
     	smartLoopView.updateParam((float)newValue / 1000.0, "tv");
     }
+    // DEPRECIATED - DO NOT USE ANYMORE
     public void tpUpdated(int newValue){
     	smartLoopView.updateParam((float)newValue / 1000.0, "tp");
     }
@@ -136,11 +151,11 @@ public class Controller implements Runnable {
     public void tfValuesChanged(double[] tfValues){
     	smartLoopView.updateSliderMaxValues(tfValues);   
     	
-    	krUpdated((int)(tfValues[0]*1000.0));
-    	tnUpdated((int)(tfValues[1]*1000.0));
-    	if(smartLoopView.getState()==smartLoopView.modifyPIDState){
-    		tvUpdated((int)(tfValues[2]*1000.0));
-			tpUpdated((int)(tfValues[3]*1000.0));
+    	krUpdated((int)(tfValues[0] * 1000.0));
+    	tnUpdated((int)(tfValues[1] * 1000.0));
+    	if(smartLoopView.getState() == smartLoopView.modifyPIDState){
+    		tvUpdated((int)(tfValues[2] * 1000.0));
+			tpUpdated((int)(tfValues[3] * 1000.0));
     	}    		
     }
     /**
@@ -182,6 +197,7 @@ public class Controller implements Runnable {
  
     
     private void addplot(double[] xValues,double[] yValues){
+    	System.out.println("adding Plot");
     	plotNummerierung++;
     	XYSeries schrittantwort=new XYSeries("Schrittantwort"+plotNummerierung);
     	for (int i = 0; i < xValues.length; i++) {

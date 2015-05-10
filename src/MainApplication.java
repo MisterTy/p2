@@ -24,7 +24,7 @@ public class MainApplication extends JFrame{
      */
     public static void main(String[] args) {
     	// Options for calculaitons
-        int anzahlPunkte = 1000;
+        int anzahlPunkte = 4000;
         
         Model smartLoopModel = new Model();
         
@@ -42,6 +42,7 @@ public class MainApplication extends JFrame{
         	scanner.close();
         } else {
         	Controller smartLoopController = new Controller(smartLoopModel);
+        	smartLoopModel.addObserver(smartLoopController);
             smartLoopController.startGui();
         }
         

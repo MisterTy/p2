@@ -10,6 +10,8 @@ public class Regelkreis {
 	
 	GenericRegler regler;
 	StepResponse stepResponse = new StepResponse();
+	boolean modified = false;
+	DimensioningResult dimensioningResult;
 
     /**
      * 
@@ -31,7 +33,14 @@ public class Regelkreis {
 			// Befehl Schrittantwort berechnen
 			break;
     	}
-    	stepResponse.calc(regler.reglerTyp, regler.getResult(), verstarkungStrecke, zeitkonstante, kreisFrequenzSpektrum);
+    	double[] params = regler.getResult().getParamArray();
+    	stepResponse.calc(regler.getTyp(), params, verstarkungStrecke, zeitkonstante, kreisFrequenzSpektrum);
+    	dimensioningResult = regler.getResult();
+    }
+    
+    public void updateStepResponse(double[] params, double verstarkungStrecke, double[] zeitkonstante, double[]kreisFrequenzSpektrum){
+    	stepResponse.calc(regler.getTyp(), params, verstarkungStrecke, zeitkonstante, kreisFrequenzSpektrum);
+    	dimensioningResult.setValues(regler.getTyp(), params[0], params[1], params[2], params[3]);
     }
     
     public double[] getXValues(){
@@ -42,8 +51,16 @@ public class Regelkreis {
     	return stepResponse.getyAxis();
     }
     
+    public DimensioningResult getResult() {
+    	return dimensioningResult;
+    }
+    
+    public boolean getModified() {
+    	return modified;
+    }
+    
     public void output(){
-    	System.out.println("Regler Typ: "+regler.reglerTyp+" Resultat: "+Arrays.toString(regler.getResult()));
+    	System.out.println("Regler Typ: "+regler.reglerTyp+" Resultat: "+Arrays.toString(regler.getResult().getParamArray()));
     }
 
 }

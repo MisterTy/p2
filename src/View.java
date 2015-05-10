@@ -53,7 +53,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 
 
-public class View extends JPanel implements Observer, ActionListener, ChangeListener, FocusListener {
+public class View extends JPanel implements ActionListener, ChangeListener, FocusListener {
 	static final int initState = 1;
 	static final int calculatingState = 2;
 	static final int modifyPIDState = 3;
@@ -340,15 +340,16 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 	}
 	
 	public void stateChanged(ChangeEvent e){
-		Object eventSource = e.getSource();
+		JSlider eventSource = (JSlider)e.getSource();
+		boolean recalc = ! eventSource.getValueIsAdjusting();
 		if (eventSource == sliderKr){			
-			actionHandler.krUpdated(sliderKr.getValue());
+			actionHandler.paramUpdated(sliderKr.getValue(), "kr", recalc);
 		} else if (eventSource == sliderTn) {
-			actionHandler.tnUpdated(sliderTn.getValue());
+			actionHandler.paramUpdated(sliderTn.getValue(), "tn", recalc);
 		} else if (eventSource == sliderTv) {
-			actionHandler.tvUpdated(sliderTv.getValue());
+			actionHandler.paramUpdated(sliderTv.getValue(), "tv", recalc);
 		} else if (eventSource == sliderTp) {
-			actionHandler.tpUpdated(sliderTp.getValue());
+			actionHandler.paramUpdated(sliderTp.getValue(), "tp", recalc);
 		} else if(eventSource==sliderPhir) {
 			
 		}
@@ -409,7 +410,9 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 	//	dataset.removeAllSeries();
 		
 		if(dataset.getSeriesIndex("Schrittantwort")==-1){
+			System.out.println("Plotting..");
 			dataset.addSeries(data);
+			chartPanel.repaint();
 			chartPanel.restoreAutoBounds(); //Zoom zurücksetzen;
 		}
 		else{
@@ -420,6 +423,16 @@ public class View extends JPanel implements Observer, ActionListener, ChangeList
 	
 	public int getState(){
 		return state;
+	}
+	
+	public double[] getParamValues(){
+		double [] paramValues = new double[4];
+		paramValues[0] = Double.parseDouble(tfKr.getText());
+		paramValues[1] = Double.parseDouble(tfTn.getText());
+		paramValues[2] = Double.parseDouble(tfTv.getText());
+		paramValues[3] = Double.parseDouble(tfTp.getText());
+		
+		return paramValues;
 	}
 	
 	

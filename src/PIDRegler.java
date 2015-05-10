@@ -113,10 +113,8 @@ public class PIDRegler extends GenericRegler {
     	double kR = (krk * (tnk + tvk - tp)) / tnk;
     	
     	// Berechnete Werte zurückgeben
-    	result[0] = kR;
-    	result[1] = tn;
-    	result[2] = tv;
-    	result[3] = tp;
+    	result.setValues(reglerTyp, kR, tn, tv, tp);
+
     }
 
 

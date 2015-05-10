@@ -119,7 +119,6 @@ public class MathLibrary {
 			Complex jw = new Complex(0,w[k]);
 			
 			if (jw.equals(Complex.ZERO)){		// für omega==0 
-				System.out.println("Konstante Paras: "+b[b.length-1]+"\t"+a[a.length-1]);
 				res[k] = new Complex(b[b.length-1] / a[a.length-1], 0);
 			} else {
 				Complex zaehler = new Complex(0, 0);
@@ -166,7 +165,6 @@ public class MathLibrary {
 	}
 	
 	public static int makePowOf2(int oldValue){
-		System.out.println("oldValue: "+oldValue+" newValue: "+(int) Math.pow(2, FastMath.ceil(FastMath.log(2.0, oldValue))));
 		return (int) Math.pow(2, FastMath.ceil(FastMath.log(2.0, oldValue)));
 	}
 
