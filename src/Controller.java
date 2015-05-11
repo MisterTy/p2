@@ -85,9 +85,7 @@ public class Controller implements Runnable, Observer {
     		smartLoopModel.setStrecke(tuValue, tgValue);
     		smartLoopModel.setPhasenrand(phir);
     		smartLoopModel.setVerstarkung(kValue);
-    		smartLoopModel.addRegelkreis(type);
-    		
-    		
+    		smartLoopModel.addRegelkreis(type);	
     	}
     	else{
     		System.out.println("Somthing is wrong with entered values...");
@@ -95,8 +93,8 @@ public class Controller implements Runnable, Observer {
     }
     
     public void update(Observable sender, Object args){
+    	System.out.println("update called...............");
     	initComplete = false;
-    	smartLoopModel.output();
     	smartLoopView.updateConsole("Berechnete Werte werden ausgegeben");
     	
     	DimensioningResult dimRes = (DimensioningResult) args;
@@ -116,11 +114,9 @@ public class Controller implements Runnable, Observer {
 		}
     	
     	smartLoopView.updateSliderMaxValues(dimRes.getParamArray());
-    	initComplete = true;
     	updatePlot(smartLoopModel.getXValues(),smartLoopModel.getYValues());
+    	initComplete = true;
     }
-    
-    
     
     public void clearPressed(){
     	smartLoopModel.removeRegelkreis();
@@ -130,10 +126,11 @@ public class Controller implements Runnable, Observer {
     
     public void paramUpdated(int newValue, String param, boolean recalc){
     	smartLoopView.updateParam((float)newValue / 1000.0, param);
-    	if (recalc && initComplete) {
+    	if (initComplete) { //recalc && initComplete
+    		System.out.println("==========Starting new SR Calculation=========");
     		smartLoopModel.updateStepResponse(0, smartLoopView.getParamValues());
+    		updatePlot(smartLoopModel.getXValues(), smartLoopModel.getYValues());
     	}
-    	updatePlot(smartLoopModel.getXValues(), smartLoopModel.getYValues());
     }
     
 	// DEPRECIATED - DO NOT USE ANYMORE
@@ -202,8 +199,8 @@ public class Controller implements Runnable, Observer {
  
     private void updatePlot(double[] xValues, double[] yValues){
     	System.out.println("ctrl updatePlot");
-    	System.out.println("X Werte: "+Arrays.toString(xValues));
-    	System.out.println("Y Werte: "+Arrays.toString(yValues));
+    	//System.out.println("X Werte: "+Arrays.toString(xValues));
+    	//System.out.println("Y Werte: "+Arrays.toString(yValues));
     	XYSeries schrittantwort=new XYSeries("Schrittantwort "+(plotNummerierung));
     	for (int i = 0; i < xValues.length; i++) {
     		schrittantwort.add(xValues[i], yValues[i]);    		
@@ -213,7 +210,7 @@ public class Controller implements Runnable, Observer {
     
     private void addPlot(){
     	plotNummerierung++;
-    /*	System.out.println("ctrl addPlot");
+    	System.out.println("ctrl addPlot"); /*
     	XYSeries schrittantwort=null;
     	System.out.println("adding Plot");
     	plotNummerierung++;

@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Observable;
 
 import org.apache.commons.math3.complex.Complex;
@@ -65,9 +66,9 @@ public class Model extends Observable {
     }
     
     public void updateStepResponse(int regelkreis, double[] params){
-    	regelKreisListe.get(regelkreis).updateStepResponse(params, regelkreis, zeitkonstante, kreisFrequenzSpektrum);
-    	setChanged();
-    	notifyObservers(regelKreisListe.get(regelkreis).getResult());
+    	regelKreisListe.get(regelkreis).updateStepResponse(params, verstarkungStrecke, zeitkonstante, kreisFrequenzSpektrum);
+    	//setChanged();
+    	//notifyObservers(regelKreisListe.get(regelkreis).getResult());
     }
     
     public void removeRegelkreis(){

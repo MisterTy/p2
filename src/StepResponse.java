@@ -100,7 +100,6 @@ public class StepResponse {
 		Complex []symVekt = new Complex[n];		//Symetrischen Vektor
 		Complex []impulsAComp = new Complex[n];		//Impulsantwort
 		double []impulsA= new double[n];		//Impulsantwort
-		double [] yAxisTmp;
 
 		
 		freqAchse = MathLibrary.linspace(0, fs*Math.PI, (n/2));
@@ -138,7 +137,9 @@ public class StepResponse {
 
 		//Zeitachse
 		this.tAxis = MathLibrary.linspace(0, (this.yAxis.length-1)*abtastRate, this.yAxis.length);
+		//System.out.println("yAxis.length-1: "+(yAxis.length-1)+" abtastRate: "+abtastRate);
 		//System.out.println("yAxis length: "+yAxis.length+" tAxis length: "+tAxis.length);
+		//System.out.println("tAxis StepResponse: "+Arrays.toString(tAxis));
 			
 	}
 	
