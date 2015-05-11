@@ -53,7 +53,7 @@ public class Controller implements Runnable, Observer {
     }
     
     
-    public void berechnenPressed(double tuValue, double tgValue, double kValue, boolean pidState, boolean piState, int sliderPhirValue){
+    public void berechnenPressed(double tuValue, double tgValue, double kValue, boolean pidState, boolean piState, String uberschwingen){
     	if (validateValues(tuValue, tgValue, kValue, pidState, piState)){
     		addPlot();
     		smartLoopView.setState(View.calculatingState);
@@ -63,27 +63,11 @@ public class Controller implements Runnable, Observer {
     		if (piState){
     			type = Model.piRegler;
     		}
-    		double phir = Math.PI/4;
-    		System.out.println("Slider Value: "+sliderPhirValue);
-    		switch(sliderPhirValue){
-    		case 0:
-    				phir=Math.PI*76.3/180;
-    			break;
-    		case 1:
-    				phir=Math.PI*65.5/180;
-    			break;
-    		case 2:
-    			   phir=Math.PI*51.5/180;			
-    			break;
-    		case 3:
-    			phir=Math.PI/4;
-    			break;
-    		}
     		
     		// Start Calculations
     		smartLoopModel.setAnzahlPunkte(1000);
     		smartLoopModel.setStrecke(tuValue, tgValue);
-    		smartLoopModel.setPhasenrand(phir);
+    		smartLoopModel.setUberschwingen(Double.parseDouble(uberschwingen));;
     		smartLoopModel.setVerstarkung(kValue);
     		smartLoopModel.addRegelkreis(type);	
     	}

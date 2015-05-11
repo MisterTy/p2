@@ -16,7 +16,7 @@ public class Model extends Observable {
 	
 	Complex[] utfStrecke;
 	double[] kreisFrequenzSpektrum;
-	double phasenrand = -1;
+	double uberschwingen = -1;
 	double verstarkungStrecke = 1;
 	double[] zeitkonstante;
 	int anzahlPunkte;
@@ -46,8 +46,8 @@ public class Model extends Observable {
     	utfStrecke = strecke.getUtfStrecke();
     }
     
-    public void setPhasenrand(double phir){
-    	this.phasenrand = phir;
+    public void setUberschwingen(double uberschwingenProzent){
+    	this.uberschwingen = uberschwingenProzent;
     }
     
     public void setVerstarkung(double verstarkung){
@@ -57,7 +57,7 @@ public class Model extends Observable {
     public void addRegelkreis(int type){
     	switch (type){
     		case piRegler: case pidRegler:
-    			Regelkreis regelkreis = new Regelkreis(type, utfStrecke, kreisFrequenzSpektrum, phasenrand, verstarkungStrecke, zeitkonstante);
+    			Regelkreis regelkreis = new Regelkreis(type, utfStrecke, kreisFrequenzSpektrum, uberschwingen, verstarkungStrecke, zeitkonstante);
     			regelKreisListe.add(regelkreis);
     			setChanged();
     			notifyObservers(regelkreis.getResult());
