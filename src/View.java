@@ -308,14 +308,15 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		
 		setState(initState);
 	
-		//Demo Werte Strecke 1:
-		
+
+		//TODO Demo Werte wieder entfernen----------------------------------------------------------------		
+		//Strecke 1: 
 		tfTu.setValue(3.08);
 		tfTg.setValue(30.8);
 		tfk.setValue(0.5);
 		btPID.setSelected(true);
 		sliderPhir.setValue(3);
-		
+		//-----------------------------------------------------------------------------------------------
 		
 	}
 
@@ -405,21 +406,41 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 	public void updateConsole(String text){
 		tfKonsole.setText(text);
 	}
-	 
-	public void updatePlot(XYSeries data){
-	//	dataset.removeAllSeries();
-		
-		if(dataset.getSeriesIndex("Schrittantwort")==-1){
-			System.out.println("Plotting..");
+	
+	public void addPlot(XYSeries data){
+		if(dataset.getSeriesIndex(data.getKey())==-1){
 			dataset.addSeries(data);
 			chartPanel.repaint();
 			chartPanel.restoreAutoBounds(); //Zoom zurücksetzen;
 		}
 		else{
-			System.out.println("SA Plot schon vorhanden");
+			System.out.println("Plot mit dem selben 'Key' schon vorhanden");
 		}
-		
 	}
+	
+	public void removePlot(XYSeries data){
+		dataset.removeSeries(dataset.getSeries(data.getKey()));
+	}
+	
+	public void removeAllPlots(){
+		System.out.println("view addPlot");
+		dataset.removeAllSeries();
+	}
+	
+	//TODO Syso's entfernen...
+	 
+	public void updatePlot(XYSeries data){	
+		System.out.println("view updatePlot");
+		if(dataset.getSeriesIndex(data.getKey())==-1){
+			addPlot(data);
+			System.out.println("Plot nicht vorhanden neuser Plot wird erstellt");
+		}else{
+			System.out.println("Plot ersetzen..");
+			dataset.removeSeries(dataset.getSeries(data.getKey()));
+			dataset.addSeries(data);			
+		}
+	}
+	
 	
 	public int getState(){
 		return state;

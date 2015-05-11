@@ -1,5 +1,6 @@
 
 import java.awt.Dimension;
+import java.util.Arrays;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -54,6 +55,7 @@ public class Controller implements Runnable, Observer {
     
     public void berechnenPressed(double tuValue, double tgValue, double kValue, boolean pidState, boolean piState, int sliderPhirValue){
     	if (validateValues(tuValue, tgValue, kValue, pidState, piState)){
+    		addPlot();
     		smartLoopView.setState(View.calculatingState);
     		smartLoopView.updateConsole("Berechnung gestartet");
     		
@@ -84,6 +86,8 @@ public class Controller implements Runnable, Observer {
     		smartLoopModel.setPhasenrand(phir);
     		smartLoopModel.setVerstarkung(kValue);
     		smartLoopModel.addRegelkreis(type);
+    		
+    		
     	}
     	else{
     		System.out.println("Somthing is wrong with entered values...");
@@ -111,9 +115,9 @@ public class Controller implements Runnable, Observer {
 			smartLoopView.updateParam(dimRes.getTp(), "tp");
 		}
     	
-    	addplot(smartLoopModel.getXValues(), smartLoopModel.getYValues());
     	smartLoopView.updateSliderMaxValues(dimRes.getParamArray());
     	initComplete = true;
+    	updatePlot(smartLoopModel.getXValues(),smartLoopModel.getYValues());
     }
     
     
@@ -129,6 +133,7 @@ public class Controller implements Runnable, Observer {
     	if (recalc && initComplete) {
     		smartLoopModel.updateStepResponse(0, smartLoopView.getParamValues());
     	}
+    	updatePlot(smartLoopModel.getXValues(), smartLoopModel.getYValues());
     }
     
 	// DEPRECIATED - DO NOT USE ANYMORE
@@ -195,14 +200,27 @@ public class Controller implements Runnable, Observer {
 		return true;
     }
  
-    
-    private void addplot(double[] xValues,double[] yValues){
-    	System.out.println("adding Plot");
-    	plotNummerierung++;
-    	XYSeries schrittantwort=new XYSeries("Schrittantwort"+plotNummerierung);
+    private void updatePlot(double[] xValues, double[] yValues){
+    	System.out.println("ctrl updatePlot");
+    	System.out.println("X Werte: "+Arrays.toString(xValues));
+    	System.out.println("Y Werte: "+Arrays.toString(yValues));
+    	XYSeries schrittantwort=new XYSeries("Schrittantwort "+(plotNummerierung));
     	for (int i = 0; i < xValues.length; i++) {
     		schrittantwort.add(xValues[i], yValues[i]);    		
 		}
-    	smartLoopView.updatePlot(schrittantwort);    	
+    	smartLoopView.updatePlot(schrittantwort);
+    }
+    
+    private void addPlot(){
+    	plotNummerierung++;
+    /*	System.out.println("ctrl addPlot");
+    	XYSeries schrittantwort=null;
+    	System.out.println("adding Plot");
+    	plotNummerierung++;
+    	schrittantwort=new XYSeries("Schrittantwort "+plotNummerierung);   	
+    	for (int i = 0; i < xValues.length; i++) {
+    		schrittantwort.add(xValues[i], yValues[i]);    		
+		}
+    	smartLoopView.addPlot(schrittantwort);    	*/
     }
 }

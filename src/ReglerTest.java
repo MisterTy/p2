@@ -50,8 +50,7 @@ public class ReglerTest extends JFrame{
     		for (int j = 0; j < Gs.length; j++) {
     			Gs[j]=Gs[j].multiply(((Complex.I.multiply(w[j]).multiply(T[i]).add(1))).reciprocal());
 				
-			}
-			
+			}			
 		}
 		
 		for (int i = 0; i < Gs.length; i++) Gs[i]=Gs[i].multiply(ks);//Gs Liste komp.
@@ -60,7 +59,7 @@ public class ReglerTest extends JFrame{
 		PIRegler piRegler=new PIRegler();
 		piRegler.setValues(Gs, w, phir, ks, T);
 		piRegler.compute();
-		System.out.println(Arrays.toString(piRegler.getResult()));
+//		System.out.println(Arrays.toString(piRegler.getResult()));
 		return ans;
 		
 	}
