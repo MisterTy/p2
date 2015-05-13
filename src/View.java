@@ -218,7 +218,7 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		panel2.add(btPI, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0,
 				GridBagConstraints.LINE_START, GridBagConstraints.NONE, new Insets(3, 0, 10, 0), 0, 0));
 		panel2.add(lbUeberschwingen, new GridBagConstraints(0, 1, 2, 1, 1.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(3, 0, 0, 0), 0, 0));
+				GridBagConstraints.LINE_START, GridBagConstraints.NONE, new Insets(3, 10, 0, 0), 0, 0));
 		panel2.add(tfOver, new GridBagConstraints(1, 1, 2, 1, 1.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(3, 0, 0, 0), 0, 0));
 		panel2.add(btClear, new GridBagConstraints(0, 4, 1, 1, 1.0, 0.0,
