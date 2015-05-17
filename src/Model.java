@@ -57,12 +57,20 @@ public class Model extends Observable {
     public void addRegelkreis(int type){
     	switch (type){
     		case piRegler: case pidRegler:
-    			Regelkreis regelkreis = new Regelkreis(type, utfStrecke, kreisFrequenzSpektrum, uberschwingen, verstarkungStrecke, zeitkonstante);
+    			Regelkreis regelkreis = new Regelkreis(type, utfStrecke, kreisFrequenzSpektrum, uberschwingen, verstarkungStrecke, zeitkonstante, 0);
     			regelKreisListe.add(regelkreis);
     			setChanged();
     			notifyObservers(regelkreis.getResult());
     			break;
     	}
+    }
+    
+    public void updateRegelkreis(double kkfOffset){
+    	Regelkreis oldRegelkreis = regelKreisListe.get(0);
+    	Regelkreis newRegelkreis = new Regelkreis(oldRegelkreis.getTyp(), utfStrecke, kreisFrequenzSpektrum, uberschwingen, verstarkungStrecke, zeitkonstante, kkfOffset);
+    	removeRegelkreis();
+    	regelKreisListe.add(newRegelkreis);
+    	// TODO notify mit notifyMessage aufrufen
     }
     
     public void updateStepResponse(int regelkreis, double[] params){

@@ -55,10 +55,11 @@ public class Controller implements Runnable, Observer {
     
     public void berechnenPressed(double tuValue, double tgValue, double kValue, boolean pidState, boolean piState, String uberschwingen){
     	if (validateValues(tuValue, tgValue, kValue, pidState, piState)){
-    		addPlot();
+    		System.out.println("before addPlot");
+    		//addPlot();
+    		System.out.println("after addPlot");
     		smartLoopView.setState(View.calculatingState);
-    		smartLoopView.updateConsole("Berechnung gestartet");
-    		
+    		//smartLoopView.updateConsole("Berechnung gestartet");
     		int type = Model.pidRegler;
     		if (piState){
     			type = Model.piRegler;
@@ -69,6 +70,7 @@ public class Controller implements Runnable, Observer {
     		smartLoopModel.setStrecke(tuValue, tgValue);
     		smartLoopModel.setUberschwingen(Double.parseDouble(uberschwingen));;
     		smartLoopModel.setVerstarkung(kValue);
+    		System.out.println("Vor addRegelkreis");
     		smartLoopModel.addRegelkreis(type);	
     	}
     	else{
@@ -116,6 +118,10 @@ public class Controller implements Runnable, Observer {
     		updatePlot(smartLoopModel.getXValues(), smartLoopModel.getYValues());
     	}
     }
+    /*
+    public void optiSliderUpdated(int newValue){
+    	smartLoopModel.updateRegelkreis((newValue / 1000) - Math.PI/2);
+    }*/
     
 	// DEPRECIATED - DO NOT USE ANYMORE
     public void krUpdated(int newValue){

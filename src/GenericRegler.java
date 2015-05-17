@@ -15,6 +15,7 @@ public class GenericRegler {
 	double phir;
 	double kS;
 	double[] t;
+	double kkf;
 
     /**
      * 
@@ -42,12 +43,15 @@ public class GenericRegler {
     	
     }
 
-    public void setValues(Complex[] utfStrecke, double[] kreisFrequenzSpektrum, double phasenrand, double verstarkungStrecke, double[] zeitkonstante) {
+    public void setValues(Complex[] utfStrecke, double[] kreisFrequenzSpektrum,
+    		double phasenrand, double verstarkungStrecke, double[] zeitkonstante,
+    		double knickKreisFrequenz) {
     	gs = utfStrecke;
     	w = kreisFrequenzSpektrum;
     	phir = phasenrand;
     	kS = verstarkungStrecke;
     	t = zeitkonstante;
+    	kkf = knickKreisFrequenz;
     }
     
     public void setGs(Complex[] utfStrecke){
@@ -68,6 +72,10 @@ public class GenericRegler {
     
     public void setT(double[] zeitkonstante){
     	t = zeitkonstante;
+    }
+    
+    public void setKKF(double knickKreisFrequenz){
+    	kkf = knickKreisFrequenz;
     }
     
     public int getTyp(){

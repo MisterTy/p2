@@ -53,8 +53,8 @@ public class PIRegler extends GenericRegler {
     	
        	phi_s=sprungEntfernen(phi_s);
     	    	
-    	int ind_left=MathLibrary.int_ver(phi_s, -(1.57079))[0];
-    	int ind_right=MathLibrary.int_ver(phi_s, -(1.57079))[1];
+    	int ind_left=MathLibrary.int_ver(phi_s, kkf)[0];
+    	int ind_right=MathLibrary.int_ver(phi_s, kkf)[1];
     	
     	double wpi=(w[ind_left]+w[ind_right])/2;
     	tn=1/wpi;

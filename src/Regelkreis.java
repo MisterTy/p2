@@ -21,7 +21,7 @@ public class Regelkreis {
     /**
      * 
      */
-    public Regelkreis(int type, Complex[] utfStrecke, double[] kreisFrequenzSpektrum, double gewunschtesUberschwingen, double verstarkungStrecke, double[] zeitkonstante){
+    public Regelkreis(int type, Complex[] utfStrecke, double[] kreisFrequenzSpektrum, double gewunschtesUberschwingen, double verstarkungStrecke, double[] zeitkonstante, double kkfOffset){
     	overshoot = 101.0;
     	double phasenrand;
     	boolean klMerker = false;
@@ -41,7 +41,7 @@ public class Regelkreis {
     	
     	while (FastMath.abs(overshoot-oldOvershoot) > precision && counter < 100){
     		oldOvershoot = overshoot;
-    		dimensionieren(type, utfStrecke, kreisFrequenzSpektrum, phasenrand, verstarkungStrecke, zeitkonstante);
+    		dimensionieren(type, utfStrecke, kreisFrequenzSpektrum, phasenrand, verstarkungStrecke, zeitkonstante, kkfOffset);
         	overshoot = calcOvershoot();
         	
         	if (overshoot > gewunschtesUberschwingen){
@@ -66,22 +66,23 @@ public class Regelkreis {
     	dimensioningResult = regler.getResult();
     }
     
-    private void dimensionieren(int type, Complex[] utfStrecke, double[] kreisFrequenzSpektrum, double phasenrand, double verstarkungStrecke, double[] zeitkonstante){
+    private void dimensionieren(int type, Complex[] utfStrecke, double[] kreisFrequenzSpektrum, double phasenrand, double verstarkungStrecke, double[] zeitkonstante, double kkfOffset){
+    	double kkf = -Math.PI/2;
     	switch (type){
 			case Model.piRegler:
+				kkf = -Math.PI/2;
 				regler = new PIRegler();
 				regler.reglerTyp = Model.piRegler;
-				regler.setValues(utfStrecke, kreisFrequenzSpektrum, phasenrand, verstarkungStrecke, zeitkonstante);
-				regler.compute();
-				// Befehl Schrittantwort berechnen
 				break;
 			case Model.pidRegler:
+				kkf = -3*Math.PI/4;
 				regler = new PIDRegler();
 				regler.reglerTyp = Model.pidRegler;
-				regler.setValues(utfStrecke, kreisFrequenzSpektrum, phasenrand, verstarkungStrecke, zeitkonstante);
-				regler.compute();
 				break;
 	    }
+    	kkf += kkfOffset;
+    	regler.setValues(utfStrecke, kreisFrequenzSpektrum, phasenrand, verstarkungStrecke, zeitkonstante, kkf);
+		regler.compute();
     	double[] params = regler.getResult().getParamArray();
     	stepResponse.calc(regler.getTyp(), params, verstarkungStrecke, zeitkonstante, kreisFrequenzSpektrum);
     }
@@ -99,6 +100,10 @@ public class Regelkreis {
     	dimensioningResult.setValues(regler.getTyp(), params[0], params[1], params[2], params[3]);
     }
     
+    public int getTyp(){
+    	return regler.getTyp();
+    }
+    
     public double[] getXValues(){
     	return stepResponse.gettAxis();
     }
@@ -114,6 +119,7 @@ public class Regelkreis {
     public boolean getModified() {
     	return modified;
     }
+    
     
     public void output(){
     	System.out.println("Regler Typ: "+regler.reglerTyp+" Resultat: "+Arrays.toString(regler.getResult().getParamArray()));

@@ -27,7 +27,7 @@ public class PIDRegler extends GenericRegler {
     	phi_s = sprungEntfernen(phi_s);
     	
     	// Index von phi = -135 finden, wPID berechnen
-    	int[] indeces = MathLibrary.int_ver(phi_s, -3*Math.PI/4);
+    	int[] indeces = MathLibrary.int_ver(phi_s, kkf);
     	int leftIndex = indeces[0];
     	int rightIndex = indeces[1];
     	double wpid = (w[leftIndex] + w[rightIndex]) / 2;
