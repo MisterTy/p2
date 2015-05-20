@@ -410,6 +410,7 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		} else if (eventSource == sliderTp) {
 			actionHandler.paramUpdated(sliderTp.getValue(), "tp", recalc);
 		}else if(eventSource== sliderOpt){
+			actionHandler.optiSliderUpdated(sliderOpt.getValue());
 			//TODO: Wert wiitergää
 		}
 	}

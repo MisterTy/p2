@@ -81,6 +81,7 @@ public class Regelkreis {
 				break;
 	    }
     	kkf += kkfOffset;
+    	System.out.println("kkf: "+kkf);
     	regler.setValues(utfStrecke, kreisFrequenzSpektrum, phasenrand, verstarkungStrecke, zeitkonstante, kkf);
 		regler.compute();
     	double[] params = regler.getResult().getParamArray();

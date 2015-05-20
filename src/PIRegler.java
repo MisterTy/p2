@@ -89,6 +89,7 @@ public class PIRegler extends GenericRegler {
     	kR=FastMath.pow(10, (kRdb/20));
     	gOffwd=grp_wd.multiply(g_str_wd);
     }
+   
     /**
      * Gibt Werte des PI Reglers in der Konsole aus.
      */

@@ -66,10 +66,14 @@ public class Model extends Observable {
     }
     
     public void updateRegelkreis(double kkfOffset){
+    	double modifier = strecke.getCoeffitients().length / 10.0;
+    	kkfOffset *= modifier;
     	Regelkreis oldRegelkreis = regelKreisListe.get(0);
     	Regelkreis newRegelkreis = new Regelkreis(oldRegelkreis.getTyp(), utfStrecke, kreisFrequenzSpektrum, uberschwingen, verstarkungStrecke, zeitkonstante, kkfOffset);
-    	removeRegelkreis();
+    	removeRegelkreis(0);
     	regelKreisListe.add(newRegelkreis);
+    	setChanged();
+    	notifyObservers(newRegelkreis.getResult());
     	// TODO notify mit notifyMessage aufrufen
     }
     
@@ -79,8 +83,8 @@ public class Model extends Observable {
     	//notifyObservers(regelKreisListe.get(regelkreis).getResult());
     }
     
-    public void removeRegelkreis(){
-    	regelKreisListe.remove(0);
+    public void removeRegelkreis(int regelkreis){
+    	regelKreisListe.remove(regelkreis);
     }
     
     public void output(){

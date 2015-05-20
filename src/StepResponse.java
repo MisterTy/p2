@@ -4,6 +4,7 @@ import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
+import org.apache.commons.math3.util.FastMath;
 import org.apache.commons.math3.util.MathArrays;
 
 
@@ -15,8 +16,8 @@ public class StepResponse {
 	private double [] yAxis;
 	private double [] tAxis;
 	private int n;
-	private double fs;
-	private double [] tmp;
+	private double ws;
+	private double [] temp;
 	
 	public StepResponse(){
 	}
@@ -28,19 +29,58 @@ public class StepResponse {
 		double [] aS;	
 		double [] aR;
 		double [] bR;
+		final int accelerate = 4;
 		
+		Complex[] gR = new Complex[kreisFrequenzspektrum.length / accelerate];
+		Complex[] gS = new Complex[kreisFrequenzspektrum.length / accelerate];
+		double[] aOdb = new double[kreisFrequenzspektrum.length / accelerate];
+		Complex tmp;
+		Complex[] pidTerm = new Complex[kreisFrequenzspektrum.length / accelerate];
+		
+		switch (type) {
+		case Model.piRegler:
+			for (int i = 0; i < kreisFrequenzspektrum.length; i+=accelerate){
+				pidTerm[i/accelerate] = new Complex(0,0);
+			}
+			break;
+			
+		case Model.pidRegler:
+			for (int i = 0; i < kreisFrequenzspektrum.length; i+=accelerate){
+				pidTerm[i/accelerate] = new Complex(0, kreisFrequenzspektrum[i] * reglerParameter[2]).divide(new Complex(1, kreisFrequenzspektrum[i] * reglerParameter[3]));
+			}
+			break;
+		}
+		
+		for (int i = 0; i < kreisFrequenzspektrum.length; i+=accelerate){
+			gR[i/accelerate] = new Complex(1, -1 / (kreisFrequenzspektrum[i] * reglerParameter[1])).add(pidTerm[i/accelerate]).multiply(reglerParameter[0]);
+			tmp = new Complex(1, 0);
+			for (int j = 0; j < zeitKonstantenStrecke.length; j++){
+				tmp = tmp.multiply(new Complex(1, kreisFrequenzspektrum[i] * zeitKonstantenStrecke[j]).reciprocal());
+			}
+			gS[i/accelerate] = tmp.multiply(streckenbeiwert);
+			aOdb[i/accelerate] = gR[i/accelerate].multiply(gS[i/accelerate]).abs();
+			aOdb[i/accelerate] = FastMath.log10(aOdb[i/accelerate]) * 20;
+		}
+		
+		
+		
+		
+		int [] indeces = MathLibrary.int_ver(aOdb, -30);
+		int factor = -10 * zeitKonstantenStrecke.length + 88;
+		ws = factor * (kreisFrequenzspektrum[indeces[0]] + kreisFrequenzspektrum[indeces[1]]) / 2;
+		n = (int)FastMath.pow(2, FastMath.ceil(FastMath.log(2, indeces[1])));
 		
 		aST = new double[zeitKonstantenStrecke.length][2]; 			//Speicher die Terme (1+sT1)(1+sT2)(1+sT3).....(1+sTn)
-		tmp = new double[1];
-		tmp[0] = 1;
+		temp = new double[1];
+		temp[0] = 1;
 		//System.out.println("tmp: "+Arrays.toString(tmp));
 		for (int i = 0; i < zeitKonstantenStrecke.length; i++) {
 			aST[i][0] = zeitKonstantenStrecke[i];
 			aST[i][1] = 1;
-			tmp = MathArrays.convolve(tmp, aST[i]);					//(1+sT1)(1+sT2)(1+sT3).....(1+sTn) falten
+			temp = MathArrays.convolve(temp, aST[i]);					//(1+sT1)(1+sT2)(1+sT3).....(1+sTn) falten
 			//System.out.println("aST["+i+"]: "+Arrays.toString(aST[i])+" tmp: "+Arrays.toString(tmp));
 		}
-		aS= tmp;				//Nennerpolyonom Strecke
+		aS= temp;				//Nennerpolyonom Strecke
 		bS[0] = streckenbeiwert;	//Z�hlerpolyonom Strecke	
 		
 		switch (type){	
@@ -74,8 +114,6 @@ public class StepResponse {
 		}
 		
 		
-		
-		
 		//A(s) = A(s) + B(s)
 		for (int i = 0; i < a.length; i++) {
 			if (i<a.length-b.length){
@@ -87,8 +125,6 @@ public class StepResponse {
 		//System.out.println("a: "+Arrays.toString(a)+" b: "+Arrays.toString(b));
 		
 		//Vorebereitung f�r FFT
-		fs = kreisFrequenzspektrum[kreisFrequenzspektrum.length-1];	//fs als max. Kreisfrequenz des w-Arrays gew�hlt
-		n = MathLibrary.makePowOf2(kreisFrequenzspektrum.length); 
 		this.schrittIfft();
 		
 		
@@ -96,13 +132,13 @@ public class StepResponse {
 	
 	public void  schrittIfft(){
 		double [] freqAchse = new double[n/2];
-		double abtastRate = 1/fs;
+		double abtastRate = 1/ws;
 		Complex []symVekt = new Complex[n];		//Symetrischen Vektor
 		Complex []impulsAComp = new Complex[n];		//Impulsantwort
 		double []impulsA= new double[n];		//Impulsantwort
 
 		
-		freqAchse = MathLibrary.linspace(0, fs*Math.PI, (n/2));
+		freqAchse = MathLibrary.linspace(0, ws*Math.PI, (n/2));
 		//System.out.println("freqAchse: "+Arrays.toString(freqAchse));
 		
 		Complex[] freqG = MathLibrary.freqs(b, a, freqAchse);	//Frequenzgang

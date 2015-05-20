@@ -43,8 +43,8 @@ public class Controller implements Runnable, Observer {
 		 view.setActionHandler(this);
 		 smartLoopView = view;
 		 frame.getContentPane().add(view);
-		 frame.setSize(800,570);
-		 frame.setMinimumSize(new Dimension(800, 570));
+		 frame.setSize(800,560);
+		 frame.setMinimumSize(new Dimension(800, 560));
 		 frame.setVisible(true);
     }
     
@@ -105,7 +105,7 @@ public class Controller implements Runnable, Observer {
     }
     
     public void clearPressed(){
-    	smartLoopModel.removeRegelkreis();
+    	smartLoopModel.removeRegelkreis(0);
     	smartLoopView.setState(View.initState);
     	smartLoopView.updateConsole("Neue Werte können eingegeben werden...");
     }
@@ -118,10 +118,10 @@ public class Controller implements Runnable, Observer {
     		updatePlot(smartLoopModel.getXValues(), smartLoopModel.getYValues());
     	}
     }
-    /*
+    
     public void optiSliderUpdated(int newValue){
-    	smartLoopModel.updateRegelkreis((newValue / 1000) - Math.PI/2);
-    }*/
+    	smartLoopModel.updateRegelkreis(((newValue / 1000.0) - Math.PI/2));
+    }
     
 	// DEPRECIATED - DO NOT USE ANYMORE
     public void krUpdated(int newValue){
