@@ -66,8 +66,11 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 	private JPanel 	panel1=new JPanel();
 	private JPanel 	panel2=new JPanel();
 	private JPanel 	panel3=new JPanel();
+	private JPanel	panel3Simple =new JPanel();
 	private JPanel 	panel4=new JPanel();
 	private JPanel 	panel5=new JPanel();
+	private JPanel	panel6 = new JPanel();
+	
 	
 	private ChartPanel chartPanel;
 	
@@ -103,6 +106,18 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 	private JFormattedDoubleTextField tfTp =new JFormattedDoubleTextField(0);
 	private JSlider sliderTp =new JSlider(0,100000,50000);
 	
+
+	
+	private JSlider sliderOpt =new JSlider(0,(int)(1000*Math.PI),(int)(500*Math.PI));
+	private JLabel lbOpt=new JLabel("Optimieren");
+	
+	
+	
+	
+	private JToggleButton btExpert=new JToggleButton("Expert");
+	private JToggleButton btSipmle=new JToggleButton("Einfach");
+	private ButtonGroup exSi =new ButtonGroup();
+	
 	
 	private JTextField tfKonsole =new JTextField("Konsole...");
 	private JPanel panelLegende=new JPanel();
@@ -119,6 +134,10 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 
 		btGroup.add(btPI);
 		btGroup.add(btPID);
+		
+		exSi.add(btExpert);
+		exSi.add(btSipmle);
+		btSipmle.setSelected(true);
 		
 		btBerechnen.addActionListener(this);
 		btClear.addActionListener(this);
@@ -155,9 +174,8 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
  //     chart.removeLegend();
         
         chartPanel = new ChartPanel(chart);
-        
         chartPanel.setMouseWheelEnabled(true);
-      
+        
         
 
 //--------------------------------------------------------------------------------------
@@ -169,13 +187,16 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		add(panel2, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(
 						0, 0, 0, 2), 0, 0));
-		add(panel3, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+		add(panel6, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(
+						2, 0, 2, 2), 0, 0));
+		add(panel3Simple, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
 				GridBagConstraints.SOUTH, GridBagConstraints.BOTH, new Insets(
-						2, 0, 0, 2), 0, 0));
-		add(panel4, new GridBagConstraints(1, 0, 1, 4, 1.0, 1.0,
+						0, 0, 0, 2), 0, 0));
+		add(panel4, new GridBagConstraints(1, 0, 1, 5, 1.0, 1.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
-						0, 2, 0, 0), 0, 0));
-		add(panel5, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
+						0, 0, 0, 0), 0, 0));
+		add(panel5, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
 						0, 0, 0, 2), 0, 0));
 		
@@ -206,11 +227,13 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		btBerechnen.setMinimumSize(new Dimension(90, 25));
 		btClear.setPreferredSize(new Dimension(90, 25));
 		btBerechnen.setPreferredSize(new Dimension(90, 25));
+		
+		
 
 		
 
-		panel2.setMinimumSize(new Dimension(200,160));
-		panel2.setPreferredSize(new Dimension(200,160));
+		panel2.setMinimumSize(new Dimension(200,130));
+		panel2.setPreferredSize(new Dimension(200,130));
 		
 		panel2.setLayout(new GridBagLayout());
 		panel2.add(btPID, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
@@ -222,10 +245,14 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		panel2.add(tfOver, new GridBagConstraints(1, 1, 2, 1, 1.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(3, 0, 0, 0), 0, 0));
 		panel2.add(btClear, new GridBagConstraints(0, 4, 1, 1, 1.0, 0.0,
-				GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(3, 0, 10, 0), 0, 0));
+				GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(3, 0, 0, 0), 0, 0));
 		panel2.add(btBerechnen, new GridBagConstraints(1, 4, 1, 1, 1.0, 0.0,
-				GridBagConstraints.LINE_START, GridBagConstraints.NONE, new Insets(3, 0, 10, 0), 0, 0));
-
+				GridBagConstraints.LINE_START, GridBagConstraints.NONE, new Insets(3, 0, 0, 0), 0, 0));
+				
+		btSipmle.addActionListener(this);
+		btExpert.addActionListener(this);
+		
+		
 		sliderKr.setPreferredSize(new Dimension(150, 25));
 		sliderKr.setMinimumSize(new Dimension(150, 25));
 		sliderTn.setPreferredSize(new Dimension(150, 25));
@@ -234,6 +261,9 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		sliderTv.setMinimumSize(new Dimension(150, 25));
 		sliderTp.setPreferredSize(new Dimension(150, 25));
 		sliderTp.setMinimumSize(new Dimension(150, 25));
+		
+		
+		
 		
 		sliderKr.addChangeListener(this);
 		sliderTn.addChangeListener(this);
@@ -266,6 +296,26 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 				GridBagConstraints.NORTH, GridBagConstraints.NONE, ins1, 0, 0));
 		panel3.add(tfTp, new GridBagConstraints(1, 7, 1, 1, 0.0, 0.0,
 				GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL,ins1, 0, 0));
+		
+		
+		panel6.setLayout(new GridBagLayout());
+		panel6.add(btSipmle, new GridBagConstraints(0, 5, 1, 1, 1.0, 0.0,
+				GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(3, 0, 3, 0), 0, 0));
+		panel6.add(btExpert, new GridBagConstraints(1, 5, 1, 1, 1.0, 0.0,
+				GridBagConstraints.LINE_START, GridBagConstraints.NONE, new Insets(3, 0, 3, 0), 0, 0));
+
+		sliderOpt.setPreferredSize(new Dimension(150, 25));
+		sliderOpt.setMinimumSize(new Dimension(150, 25));
+		sliderOpt.addChangeListener(this);
+		
+		panel3Simple.setLayout(new GridBagLayout());
+		panel3Simple.add(lbOpt, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(3, 0, 0, 0), 0, 0));
+		panel3Simple.add(sliderOpt, new GridBagConstraints(0, 1, 2, 1, 0.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(3, 0, 0, 0), 0, 0));
+		
+		
+		
 
 		tfKr.addFocusListener(this);
 		tfTn.addFocusListener(this);
@@ -293,8 +343,10 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		panel1.setBackground(Color.white);
 		panel2.setBackground(Color.white);
 		panel3.setBackground(Color.white);
+		panel3Simple.setBackground(Color.white);
 		panel4.setBackground(Color.white);
 		panel5.setBackground(Color.white);
+		panel6.setBackground(Color.white);
 		
 		setState(initState);
 	
@@ -307,6 +359,8 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		btPID.setSelected(true);
 		tfOver.setText("20");
 		//-----------------------------------------------------------------------------------------------
+		
+		
 		
 	}
 
@@ -327,7 +381,21 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 			eingabe[2]=Double.parseDouble(tfTv.getText());
 			eingabe[3]=Double.parseDouble(tfTp.getText());
 			actionHandler.tfValuesChanged(eingabe);
-		}
+		} else if(eventSource==btSipmle)
+		{
+			remove(panel3);
+			add(panel3Simple, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
+					GridBagConstraints.SOUTH, GridBagConstraints.BOTH, new Insets(
+							0, 0, 0, 2), 0, 0));
+			updateUI();		
+		}else if(eventSource==btExpert)
+		{
+			remove(panel3Simple);
+			add(panel3, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
+					GridBagConstraints.SOUTH, GridBagConstraints.BOTH, new Insets(
+							0, 0, 0, 2), 0, 0));
+			updateUI();		
+		}		
 	}
 	
 	public void stateChanged(ChangeEvent e){
@@ -341,6 +409,8 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 			actionHandler.paramUpdated(sliderTv.getValue(), "tv", recalc);
 		} else if (eventSource == sliderTp) {
 			actionHandler.paramUpdated(sliderTp.getValue(), "tp", recalc);
+		}else if(eventSource== sliderOpt){
+			//TODO: Wert wiitergää
 		}
 	}
 	

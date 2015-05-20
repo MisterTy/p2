@@ -43,8 +43,8 @@ public class Controller implements Runnable, Observer {
 		 view.setActionHandler(this);
 		 smartLoopView = view;
 		 frame.getContentPane().add(view);
-		 frame.setSize(800,560);
-		 frame.setMinimumSize(new Dimension(800, 560));
+		 frame.setSize(800,570);
+		 frame.setMinimumSize(new Dimension(800, 570));
 		 frame.setVisible(true);
     }
     
