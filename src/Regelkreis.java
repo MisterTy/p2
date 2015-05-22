@@ -15,7 +15,7 @@ public class Regelkreis {
 	boolean modified = false;
 	double overshoot;
 	double oldOvershoot;
-	
+	static int counter=0;					// Damit step-Response darauf zugreifen kann
 	double precision = 0.00001;
 
     /**
@@ -26,7 +26,7 @@ public class Regelkreis {
     	double phasenrand;
     	boolean klMerker = false;
     	boolean grMerker = false;
-    	int counter = 0;
+    	counter = 0;
     	
     	if (gewunschtesUberschwingen >= 23.3){
     		phasenrand = 0.785;
@@ -125,5 +125,4 @@ public class Regelkreis {
     public void output(){
     	System.out.println("Regler Typ: "+regler.reglerTyp+" Resultat: "+Arrays.toString(regler.getResult().getParamArray()));
     }
-
 }

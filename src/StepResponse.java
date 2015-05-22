@@ -29,46 +29,6 @@ public class StepResponse {
 		double [] aS;	
 		double [] aR;
 		double [] bR;
-		final int accelerate = 4;
-		
-		Complex[] gR = new Complex[kreisFrequenzspektrum.length / accelerate];
-		Complex[] gS = new Complex[kreisFrequenzspektrum.length / accelerate];
-		double[] aOdb = new double[kreisFrequenzspektrum.length / accelerate];
-		Complex tmp;
-		Complex[] pidTerm = new Complex[kreisFrequenzspektrum.length / accelerate];
-		
-		switch (type) {
-		case Model.piRegler:
-			for (int i = 0; i < kreisFrequenzspektrum.length; i+=accelerate){
-				pidTerm[i/accelerate] = new Complex(0,0);
-			}
-			break;
-			
-		case Model.pidRegler:
-			for (int i = 0; i < kreisFrequenzspektrum.length; i+=accelerate){
-				pidTerm[i/accelerate] = new Complex(0, kreisFrequenzspektrum[i] * reglerParameter[2]).divide(new Complex(1, kreisFrequenzspektrum[i] * reglerParameter[3]));
-			}
-			break;
-		}
-		
-		for (int i = 0; i < kreisFrequenzspektrum.length; i+=accelerate){
-			gR[i/accelerate] = new Complex(1, -1 / (kreisFrequenzspektrum[i] * reglerParameter[1])).add(pidTerm[i/accelerate]).multiply(reglerParameter[0]);
-			tmp = new Complex(1, 0);
-			for (int j = 0; j < zeitKonstantenStrecke.length; j++){
-				tmp = tmp.multiply(new Complex(1, kreisFrequenzspektrum[i] * zeitKonstantenStrecke[j]).reciprocal());
-			}
-			gS[i/accelerate] = tmp.multiply(streckenbeiwert);
-			aOdb[i/accelerate] = gR[i/accelerate].multiply(gS[i/accelerate]).abs();
-			aOdb[i/accelerate] = FastMath.log10(aOdb[i/accelerate]) * 20;
-		}
-		
-		
-		
-		
-		int [] indeces = MathLibrary.int_ver(aOdb, -30);
-		int factor = -10 * zeitKonstantenStrecke.length + 88;
-		ws = factor * (kreisFrequenzspektrum[indeces[0]] + kreisFrequenzspektrum[indeces[1]]) / 2;
-		n = (int)FastMath.pow(2, FastMath.ceil(FastMath.log(2, indeces[1])));
 		
 		aST = new double[zeitKonstantenStrecke.length][2]; 			//Speicher die Terme (1+sT1)(1+sT2)(1+sT3).....(1+sTn)
 		temp = new double[1];
@@ -124,7 +84,22 @@ public class StepResponse {
 		}
 		//System.out.println("a: "+Arrays.toString(a)+" b: "+Arrays.toString(b));
 		
-		//Vorebereitung fï¿½r FFT
+		//Vorebereitung fuer FFT
+		if (Regelkreis.counter == 0)		//Nur bei Änderung des Sliders soll ws und N neu berechnet werden
+		{
+			Complex[] freqG_tmp = MathLibrary.freqs(b, a, kreisFrequenzspektrum);	//Frequenzgang berechnen
+			double[] amplG_tmp = new double[kreisFrequenzspektrum.length];		
+			for (int i = 0; i < kreisFrequenzspektrum.length; i++) {
+				amplG_tmp[i] =  FastMath.log10(freqG_tmp[i].abs())*20;				//Berrechnung des Amplitudengangs
+			}
+			System.out.println("Adb: "+Arrays.toString(amplG_tmp)+"length: "+(amplG_tmp.length));
+
+			int [] indeces = MathLibrary.int_ver(amplG_tmp, -20.0);
+			System.out.println("index: "+Arrays.toString(indeces));
+			ws =  20*(kreisFrequenzspektrum[indeces[0]] + kreisFrequenzspektrum[indeces[1]]) / 2;
+			n = (int)FastMath.pow(2, FastMath.ceil(FastMath.log(2, indeces[1])));
+		}
+		
 		this.schrittIfft();
 		
 		
