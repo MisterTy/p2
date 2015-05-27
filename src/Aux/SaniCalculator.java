@@ -1,3 +1,4 @@
+package Aux;
 
 import org.apache.commons.math3.*; //TODO Reduce Import to include only the needed packages (streamlining)
 import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;

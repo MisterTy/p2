@@ -1,5 +1,8 @@
+package Aux;
 import java.util.Arrays;
 import java.util.Scanner;
+
+import Model.Model;
 
 
 public class AutoTest {
@@ -36,8 +39,8 @@ public class AutoTest {
             model.setVerstarkung(ks);
             model.addRegelkreis(typ);
             model.output();
-            System.out.println("X-Values: "+Arrays.toString(model.regelKreisListe.get(0).getXValues()));
-            System.out.println("Y-Values: "+Arrays.toString(model.regelKreisListe.get(0).getYValues()));
+            //System.out.println("X-Values: "+Arrays.toString(model.regelKreisListe.get(0).getXValues()));
+            //System.out.println("Y-Values: "+Arrays.toString(model.regelKreisListe.get(0).getYValues()));
 		}
 	}
 	

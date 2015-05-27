@@ -1,8 +1,12 @@
+package Model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Observable;
 
 import org.apache.commons.math3.complex.Complex;
+
+import Aux.MathLibrary;
+import Aux.Notification;
 
 /**
  * 
@@ -43,7 +47,6 @@ public class Model extends Observable {
     	kreisFrequenzSpektrum = MathLibrary.logspace(Math.log10(1/(tMax*10)), Math.log10(1/(tMin/10)), anzahlPunkte);
     	
     	strecke.calculateUtf(anzahlPunkte, kreisFrequenzSpektrum, verstarkungStrecke);
-    	utfStrecke = strecke.getUtfStrecke();
     }
     
     public void setUberschwingen(double uberschwingenProzent){
@@ -57,34 +60,49 @@ public class Model extends Observable {
     public void addRegelkreis(int type){
     	switch (type){
     		case piRegler: case pidRegler:
-    			Regelkreis regelkreis = new Regelkreis(type, utfStrecke, kreisFrequenzSpektrum, uberschwingen, verstarkungStrecke, zeitkonstante, 0);
+    			Regelkreis regelkreis = new Regelkreis(type, strecke, kreisFrequenzSpektrum, uberschwingen, verstarkungStrecke, zeitkonstante, 0);
     			regelKreisListe.add(regelkreis);
+    			Notification note = new Notification(Notification.newRegelkreis);
+    			note.setRegelkreis(regelkreis);
+    			note.setDimensioningResult(regelkreis.getResult());
     			setChanged();
-    			notifyObservers(regelkreis.getResult());
+    			notifyObservers(note);
     			break;
     	}
     }
     
-    public void updateRegelkreis(double kkfOffset){
-    	double modifier = strecke.getCoeffitients().length / 10.0;
+    public void updateRegelkreis(double kkfOffset, int regelkreisIndex){
+    	int n = strecke.getN();
+    	double modifier = n / 25.0;
+    	System.out.println("modifier: "+modifier);
     	kkfOffset *= modifier;
-    	Regelkreis oldRegelkreis = regelKreisListe.get(0);
-    	Regelkreis newRegelkreis = new Regelkreis(oldRegelkreis.getTyp(), utfStrecke, kreisFrequenzSpektrum, uberschwingen, verstarkungStrecke, zeitkonstante, kkfOffset);
-    	removeRegelkreis(0);
-    	regelKreisListe.add(newRegelkreis);
+    	Regelkreis oldRegelkreis = regelKreisListe.get(regelkreisIndex);
+    	Regelkreis newRegelkreis = new Regelkreis(oldRegelkreis.getTyp(), strecke, kreisFrequenzSpektrum, uberschwingen, verstarkungStrecke, zeitkonstante, kkfOffset);
+    	removeRegelkreis(regelkreisIndex);
+    	regelKreisListe.add(regelkreisIndex, newRegelkreis);
+    	Notification note = new Notification(Notification.updatedRegelkreis);
+    	note.setRegelkreis(newRegelkreis);
+    	note.setDimensioningResult(newRegelkreis.getResult());
     	setChanged();
-    	notifyObservers(newRegelkreis.getResult());
-    	// TODO notify mit notifyMessage aufrufen
+    	notifyObservers(note);
     }
     
     public void updateStepResponse(int regelkreis, double[] params){
     	regelKreisListe.get(regelkreis).updateStepResponse(params, verstarkungStrecke, zeitkonstante, kreisFrequenzSpektrum);
-    	//setChanged();
-    	//notifyObservers(regelKreisListe.get(regelkreis).getResult());
+    	Notification note = new Notification(Notification.updatedStepResponse);
+    	note.setRegelkreis(regelKreisListe.get(regelkreis));
+    	note.setDimensioningResult(note.getRegelkreis().getResult());
+    	setChanged();
+    	notifyObservers(note);
     }
     
     public void removeRegelkreis(int regelkreis){
     	regelKreisListe.remove(regelkreis);
+    }
+    
+    public void deleteAllRegelkreise(){
+    	regelKreisListe.clear();
+    	strecke = null;
     }
     
     public void output(){

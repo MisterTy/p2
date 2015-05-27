@@ -1,3 +1,4 @@
+package Model;
 import java.util.Arrays;
 
 import org.apache.commons.math3.complex.Complex;
@@ -6,6 +7,8 @@ import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
 import org.apache.commons.math3.util.FastMath;
 import org.apache.commons.math3.util.MathArrays;
+
+import Aux.MathLibrary;
 
 
 public class StepResponse {
@@ -23,7 +26,7 @@ public class StepResponse {
 	}
 	
 	
-	public void calc(int type, double[] reglerParameter, double streckenbeiwert, double [] zeitKonstantenStrecke, double[] kreisFrequenzspektrum){
+	public void calc(int type, double[] reglerParameter, double streckenbeiwert, double [] zeitKonstantenStrecke, double[] kreisFrequenzspektrum, boolean initial){
 		double [][] aST;
 		double  bS[] = new double[1];	
 		double [] aS;	
@@ -85,19 +88,23 @@ public class StepResponse {
 		//System.out.println("a: "+Arrays.toString(a)+" b: "+Arrays.toString(b));
 		
 		//Vorebereitung fuer FFT
-		if (Regelkreis.counter == 0)		//Nur bei Änderung des Sliders soll ws und N neu berechnet werden
+		if (initial)		//Nur bei ï¿½nderung des Sliders soll ws und N neu berechnet werden
 		{
 			Complex[] freqG_tmp = MathLibrary.freqs(b, a, kreisFrequenzspektrum);	//Frequenzgang berechnen
 			double[] amplG_tmp = new double[kreisFrequenzspektrum.length];		
 			for (int i = 0; i < kreisFrequenzspektrum.length; i++) {
 				amplG_tmp[i] =  FastMath.log10(freqG_tmp[i].abs())*20;				//Berrechnung des Amplitudengangs
 			}
-			System.out.println("Adb: "+Arrays.toString(amplG_tmp)+"length: "+(amplG_tmp.length));
+			//System.out.println("Adb: "+Arrays.toString(amplG_tmp)+"length: "+(amplG_tmp.length));
 
 			int [] indeces = MathLibrary.int_ver(amplG_tmp, -20.0);
-			System.out.println("index: "+Arrays.toString(indeces));
-			ws =  20*(kreisFrequenzspektrum[indeces[0]] + kreisFrequenzspektrum[indeces[1]]) / 2;
-			n = (int)FastMath.pow(2, FastMath.ceil(FastMath.log(2, indeces[1])));
+			//System.out.println("index: "+Arrays.toString(indeces));
+			//int factor = -10 * zeitKonstantenStrecke.length + 88;
+			double factor = -1.25 * zeitKonstantenStrecke.length + 18.5;
+			ws = factor*(kreisFrequenzspektrum[indeces[0]] + kreisFrequenzspektrum[indeces[1]]) / 2; // was 20
+			//ws = kreisFrequenzspektrum[kreisFrequenzspektrum.length-1];
+			//n = (int)FastMath.pow(2, FastMath.ceil(FastMath.log(2, indeces[1])));
+			n = (int)FastMath.pow(2, FastMath.ceil(FastMath.log(2, kreisFrequenzspektrum.length)));
 		}
 		
 		this.schrittIfft();
@@ -105,7 +112,7 @@ public class StepResponse {
 		
 	}
 	
-	public void  schrittIfft(){
+	private void  schrittIfft(){
 		double [] freqAchse = new double[n/2];
 		double abtastRate = 1/ws;
 		Complex []symVekt = new Complex[n];		//Symetrischen Vektor
@@ -155,13 +162,20 @@ public class StepResponse {
 	}
 	
 	
-	
 	public double[]  getyAxis(){
 		return this.yAxis;
 	}
 	
 	public double[]  gettAxis(){
 		return this.tAxis;
+	}
+	
+	public double getWs(){
+		return ws;
+	}
+	
+	public int getN(){
+		return n;
 	}
 
 }

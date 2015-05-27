@@ -1,16 +1,17 @@
-import java.util.Arrays;
-
+package Model;
 import org.apache.commons.math3.complex.Complex;
+
+import Aux.SaniCalculator;
 
 /**
  * 
  */
 public class Strecke {
-	double tu = -1;
-	double tg = -1;
-	double[] coeffitients;
-	int n;
-	Complex[] utfStrecke;
+	private double tu = -1;
+	private double tg = -1;
+	private double[] coeffitients;
+	private int n;
+	private Complex[] utfStrecke;
 
     /**
      * 
@@ -50,6 +51,14 @@ public class Strecke {
     
     public double[] getCoeffitients(){
     	return coeffitients;
+    }
+    
+    public double getTu(){
+    	return tu;
+    }
+    
+    public double getTg(){
+    	return tg;
     }
 
 

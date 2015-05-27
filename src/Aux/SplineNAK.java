@@ -1,3 +1,4 @@
+package Aux;
 // Source: http://www.pcs.cnu.edu/~bbradie/cpp/interp.C
 
 public class SplineNAK {

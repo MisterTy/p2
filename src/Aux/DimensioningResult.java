@@ -1,3 +1,4 @@
+package Aux;
 
 public class DimensioningResult {
 	private double kr;

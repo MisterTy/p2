@@ -1,3 +1,4 @@
+package View;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -30,16 +31,22 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JRootPane;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableCellRenderer;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartFrame;
@@ -50,18 +57,27 @@ import org.jfree.data.xy.XYDatasetTableModel;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
+import Controller.ColorCellRenderer;
+import Controller.Controller;
+import Controller.PlotManager;
+import Model.Regelkreis;
 
 
 
-public class View extends JPanel implements ActionListener, ChangeListener, FocusListener {
-	static final int initState = 1;
-	static final int calculatingState = 2;
-	static final int modifyPIDState = 3;
-	static final int modifyPIState = 4;
+
+public class View extends JPanel implements ActionListener, ChangeListener, FocusListener, ListSelectionListener {
+	private static final long serialVersionUID = 1L;
 	
-	static final String numFormat = "%1$,.3f";
+	public static final int initState = 1;
+	public static final int calculatingState = 2;
+	public static final int modifyPIDState = 3;
+	public static final int modifyPIState = 4;
+	
+	//public static final String numFormat = "%1$,.3f";
+	public static final String numFormat = "%6.3e";
 	
 	private int state = initState;
+	private boolean purging = false;
 
 	private JPanel 	panel1=new JPanel();
 	private JPanel 	panel2=new JPanel();
@@ -70,6 +86,7 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 	private JPanel 	panel4=new JPanel();
 	private JPanel 	panel5=new JPanel();
 	private JPanel	panel6 = new JPanel();
+	private JPanel managementPanel = new JPanel();
 	
 	
 	private ChartPanel chartPanel;
@@ -87,8 +104,6 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 	private JButton btClear =new JButton("Clear");
 	private JButton btBerechnen =new JButton("Berechnen");
 	private ButtonGroup btGroup =new ButtonGroup();
-
-	
 	
 	private JLabel lbUeberschwingen=new JLabel("Überschwingen");
 	private JFormattedDoubleTextField tfOver = new JFormattedDoubleTextField(0);
@@ -106,23 +121,34 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 	private JFormattedDoubleTextField tfTp =new JFormattedDoubleTextField(0);
 	private JSlider sliderTp =new JSlider(0,100000,50000);
 	
-
-	
 	private JSlider sliderOpt =new JSlider(0,(int)(1000*Math.PI),(int)(500*Math.PI));
 	private JLabel lbOpt=new JLabel("Optimieren");
-	
-	
-	
 	
 	private JToggleButton btExpert=new JToggleButton("Expert");
 	private JToggleButton btSipmle=new JToggleButton("Einfach");
 	private ButtonGroup exSi =new ButtonGroup();
 	
+	private JLabel lbSchrittantworten = new JLabel("Schrittantworten:");
+	private JLabel lbStreckenparameter = new JLabel("Strecken-Informationen:");
+	private JLabel lbReglerparameter = new JLabel("Regler-Informationen:");
+	private PlotManager plotManager = new PlotManager();
+	private TableCellRenderer colorCellRenderer = new ColorCellRenderer(plotManager);
+	private JTable stepResponseTable;
+	private JScrollPane stepResponseScrollPane;
+	private JTable streckenInfoTable;
+	private JScrollPane streckenInfoScrollPane;
+	private JTable reglerInfoTable;
+	private JScrollPane reglerInfoScrollPane;
+	private JButton btPin = new JButton("Pin");
+	private JButton btNew = new JButton("Neu");
+	private JButton btDelete = new JButton("Löschen");
+	private JButton btDelAll = new JButton("Alle Löschen");
 	
 	private JTextField tfKonsole =new JTextField("Konsole...");
 	private JPanel panelLegende=new JPanel();
 	
-    XYSeriesCollection dataset = new XYSeriesCollection();
+	private JFreeChart chart;
+    private XYSeriesCollection dataset;
 	
 	private Controller actionHandler;
 	
@@ -153,7 +179,8 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		tfk.setMaxValue(100);
 		tfk.setMinValue(0);
 		tfk.setEmptyAllowed(false);
-
+		
+	
 
 		
 		/*
@@ -166,16 +193,37 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		 */
 	
 //*****************************************************************************		
-
-        
-
-        
-        JFreeChart chart = ChartFactory.createXYLineChart(" ", "Zeit", "Amplitude", dataset);
- //     chart.removeLegend();
+		
+		dataset = plotManager.getDataset();
+		chart = ChartFactory.createXYLineChart(" ", "Zeit", "Amplitude", dataset);
+        chart.removeLegend();
+		plotManager.setRenderer(chart.getXYPlot().getRenderer());
         
         chartPanel = new ChartPanel(chart);
         chartPanel.setMouseWheelEnabled(true);
+		
+        stepResponseTable = new JTable(plotManager.getTableModel(PlotManager.stepResponseTable)){
+			private static final long serialVersionUID = 1L;
+			public TableCellRenderer getCellRenderer(int row, int column) {
+		        if (column == 0) {
+		            return colorCellRenderer;
+		        }
+		        return super.getCellRenderer(row, column);
+		    }
+        	
+        };
+        streckenInfoTable = new JTable(plotManager.getTableModel(PlotManager.streckenInfoTable));
+        reglerInfoTable = new JTable(plotManager.getTableModel(PlotManager.reglerInfoTable));
+        stepResponseScrollPane = new JScrollPane(stepResponseTable);
+        streckenInfoScrollPane = new JScrollPane(streckenInfoTable);
+        reglerInfoScrollPane = new JScrollPane(reglerInfoTable);
         
+        //stepResponseTable.setDefaultRenderer(Object.class, new ColorCellRenderer(plotManager));
+        //stepResponseTable.getSelectionModel().addListSelectionListener(plotManager);
+        stepResponseTable.getSelectionModel().addListSelectionListener(this);
+        stepResponseTable.getColumnModel().getColumn(0).setMinWidth(15);
+        stepResponseTable.getColumnModel().getColumn(0).setMaxWidth(15);
+        reglerInfoTable.getColumnModel().getColumn(0).setMinWidth(105);
         
 
 //--------------------------------------------------------------------------------------
@@ -193,7 +241,10 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		add(panel3Simple, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
 				GridBagConstraints.SOUTH, GridBagConstraints.BOTH, new Insets(
 						0, 0, 0, 2), 0, 0));
-		add(panel4, new GridBagConstraints(1, 0, 1, 5, 1.0, 1.0,
+		add(managementPanel, new GridBagConstraints(1, 0, 1, 5, 0.0, 0.0,
+				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(
+						0, 0, 0, 0), 0, 0));
+		add(panel4, new GridBagConstraints(2, 0, 1, 5, 1.0, 1.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
 						0, 0, 0, 0), 0, 0));
 		add(panel5, new GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
@@ -314,6 +365,41 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		panel3Simple.add(sliderOpt, new GridBagConstraints(0, 1, 2, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(3, 0, 0, 0), 0, 0));
 		
+		Dimension dim = new Dimension(200, 130);
+		stepResponseScrollPane.setMinimumSize(dim);
+		stepResponseScrollPane.setPreferredSize(dim);
+		streckenInfoScrollPane.setMinimumSize(dim);
+		streckenInfoScrollPane.setPreferredSize(dim);
+		reglerInfoScrollPane.setMinimumSize(dim);
+		reglerInfoScrollPane.setPreferredSize(dim);
+		
+		streckenInfoTable.setCellSelectionEnabled(false);
+		reglerInfoTable.setCellSelectionEnabled(false);
+		
+		managementPanel.setLayout(new GridBagLayout());
+		managementPanel.add(lbSchrittantworten, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0,
+				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 10), 0, 0));
+		managementPanel.add(stepResponseScrollPane, new GridBagConstraints(0, 1, 2, 1, 0.0, 0.0,
+				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 0), 0, 0));
+		managementPanel.add(btPin, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 10), 0, 0));
+		managementPanel.add(btNew, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
+				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 10), 0, 0));
+		managementPanel.add(btDelete, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
+				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 10), 0, 0));
+		managementPanel.add(btDelAll, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0,
+				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 10), 0, 0));
+		managementPanel.add(lbReglerparameter, new GridBagConstraints(0, 4, 2, 1, 0.0, 0.0,
+				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 10), 0, 0));
+		managementPanel.add(reglerInfoScrollPane, new GridBagConstraints(0, 5, 2, 1, 0.0, 0.0,
+				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 0), 0, 0));
+		managementPanel.add(lbStreckenparameter, new GridBagConstraints(0, 6, 2, 1, 0.0, 0.0,
+				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 10), 0, 0));
+		managementPanel.add(streckenInfoScrollPane, new GridBagConstraints(0, 7, 2, 1, 0.0, 0.0,
+				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 0), 0, 0));
+		
+		btDelete.addActionListener(this);
+		btDelAll.addActionListener(this);
 		
 		
 
@@ -344,6 +430,7 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		panel2.setBackground(Color.white);
 		panel3.setBackground(Color.white);
 		panel3Simple.setBackground(Color.white);
+		managementPanel.setBackground(Color.lightGray);
 		panel4.setBackground(Color.white);
 		panel5.setBackground(Color.white);
 		panel6.setBackground(Color.white);
@@ -371,9 +458,11 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		Object eventSource = e.getSource();
 		if (eventSource == btBerechnen){
 			actionHandler.berechnenPressed(tfTu.getValue(), tfTg.getValue(), tfk.getValue(), btPID.isSelected(), btPI.isSelected(),tfOver.getText());
+		
 		} else if (eventSource == btClear){
 //			dataset.removeAllSeries();
 			actionHandler.clearPressed();
+			
 		} else if(eventSource==tfKr||eventSource==tfTn||eventSource==tfTv||eventSource==tfTp){
 			double[] eingabe=new double[4];
 			eingabe[0]=Double.parseDouble(tfKr.getText());
@@ -381,6 +470,7 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 			eingabe[2]=Double.parseDouble(tfTv.getText());
 			eingabe[3]=Double.parseDouble(tfTp.getText());
 			actionHandler.tfValuesChanged(eingabe);
+			
 		} else if(eventSource==btSipmle)
 		{
 			remove(panel3);
@@ -388,30 +478,45 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 					GridBagConstraints.SOUTH, GridBagConstraints.BOTH, new Insets(
 							0, 0, 0, 2), 0, 0));
 			updateUI();		
-		}else if(eventSource==btExpert)
+			
+		} else if(eventSource==btExpert)
 		{
 			remove(panel3Simple);
 			add(panel3, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
 					GridBagConstraints.SOUTH, GridBagConstraints.BOTH, new Insets(
 							0, 0, 0, 2), 0, 0));
 			updateUI();		
-		}		
+		} else if (eventSource == btDelete){
+			actionHandler.deleteRegelkreis(plotManager.getSelectedIndex());
+			int index = plotManager.removeSelectedPlot();
+			if (index >= 0){
+				stepResponseTable.setRowSelectionInterval(index, index);
+			}
+		} else if (eventSource == btDelAll){
+			purging = true;
+			plotManager.removeAllPlots();
+			actionHandler.deleteAllRegelkreise();
+			purging = false;
+		}
 	}
 	
 	public void stateChanged(ChangeEvent e){
 		JSlider eventSource = (JSlider)e.getSource();
 		boolean recalc = ! eventSource.getValueIsAdjusting();
+		int index = plotManager.getSelectedIndex();
 		if (eventSource == sliderKr){			
-			actionHandler.paramUpdated(sliderKr.getValue(), "kr", recalc);
+			actionHandler.paramUpdated(sliderKr.getValue(), "kr", index, recalc);
 		} else if (eventSource == sliderTn) {
-			actionHandler.paramUpdated(sliderTn.getValue(), "tn", recalc);
+			actionHandler.paramUpdated(sliderTn.getValue(), "tn", index, recalc);
 		} else if (eventSource == sliderTv) {
-			actionHandler.paramUpdated(sliderTv.getValue(), "tv", recalc);
+			actionHandler.paramUpdated(sliderTv.getValue(), "tv", index, recalc);
 		} else if (eventSource == sliderTp) {
-			actionHandler.paramUpdated(sliderTp.getValue(), "tp", recalc);
-		}else if(eventSource== sliderOpt){
-			actionHandler.optiSliderUpdated(sliderOpt.getValue());
-			//TODO: Wert wiitergää
+			actionHandler.paramUpdated(sliderTp.getValue(), "tp", index, recalc);
+		}else if(eventSource == sliderOpt){
+			int selectedIndex = plotManager.getSelectedIndex();
+			actionHandler.optiSliderUpdated(sliderOpt.getValue(), selectedIndex);
+			stepResponseTable.setRowSelectionInterval(selectedIndex, selectedIndex);
+			
 		}
 	}
 	
@@ -466,6 +571,14 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		tfKonsole.setText(text);
 	}
 	
+	public void addPlot(Regelkreis regelkreis){
+		int index = plotManager.addPlot(regelkreis);
+		dataset = plotManager.getDataset();
+		chartPanel.repaint();
+		chartPanel.restoreAutoBounds();
+		stepResponseTable.setRowSelectionInterval(index, index);
+	}
+	
 	public void addPlot(XYSeries data){
 		if(dataset.getSeriesIndex(data.getKey())==-1){
 			dataset.addSeries(data);
@@ -482,8 +595,11 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 	}
 	
 	public void removeAllPlots(){
-		System.out.println("view addPlot");
 		dataset.removeAllSeries();
+	}
+	
+	public void updatePlot(Regelkreis regelkreis){
+		plotManager.updateSelectedPlot(regelkreis);
 	}
 	
 	//TODO Syso's entfernen...
@@ -491,8 +607,8 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 	public void updatePlot(XYSeries data){	
 		System.out.println("view updatePlot");
 		if(dataset.getSeriesIndex(data.getKey())==-1){
-			addPlot(data);
 			System.out.println("Plot nicht vorhanden neuser Plot wird erstellt");
+			addPlot(data);
 		}else{
 			System.out.println("Plot ersetzen..");
 			dataset.removeSeries(dataset.getSeries(data.getKey()));
@@ -515,7 +631,6 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		
 		return paramValues;
 	}
-	
 	
 	public void setState(int newState){
 		state = newState;
@@ -604,6 +719,15 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 	public void focusGained(FocusEvent e) {
 		// TODO Auto-generated method stub
 		
+	}
+
+
+
+	@Override
+	public void valueChanged(ListSelectionEvent e) {
+		if (!purging){
+			plotManager.valueChanged(e);
+		}
 	}
 
 }

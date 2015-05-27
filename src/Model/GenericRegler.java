@@ -1,7 +1,10 @@
+package Model;
 
 import java.util.*;
 
 import org.apache.commons.math3.complex.Complex;
+
+import Aux.DimensioningResult;
 
 /**
  * 

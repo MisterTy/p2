@@ -1,3 +1,4 @@
+package Controller;
 
 import java.awt.Dimension;
 import java.util.Arrays;
@@ -10,12 +11,22 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.jfree.data.xy.XYSeries;
+
+import Aux.DimensioningResult;
+import Aux.Notification;
+import Model.Model;
+import Model.Regelkreis;
+import View.View;
+
 /**
  * Verwaltet eingaben, die druch das View gemacht werden.
  */
 public class Controller implements Runnable, Observer {
 	Model smartLoopModel;
 	View smartLoopView;
+	TableModel stepResponseTableModel;
+	TableModel streckenParamTableModel;
+	TableModel reglerParamTableModel;
 	
 	boolean initComplete = false;
 	
@@ -44,7 +55,7 @@ public class Controller implements Runnable, Observer {
 		 smartLoopView = view;
 		 frame.getContentPane().add(view);
 		 frame.setSize(800,560);
-		 frame.setMinimumSize(new Dimension(800, 560));
+		 frame.setMinimumSize(new Dimension(1200, 560));
 		 frame.setVisible(true);
     }
     
@@ -83,7 +94,23 @@ public class Controller implements Runnable, Observer {
     	initComplete = false;
     	smartLoopView.updateConsole("Berechnete Werte werden ausgegeben");
     	
-    	DimensioningResult dimRes = (DimensioningResult) args;
+    	Notification note = (Notification) args;
+    	Regelkreis regelkreis;
+    	switch (note.getMessage()){
+    	case Notification.newRegelkreis:
+    		regelkreis = note.getRegelkreis();
+    		DimensioningResult dimRes = note.getDimensioningResult();
+    		handleNewRegelkreis(regelkreis, dimRes);
+    		break;
+    	case Notification.updatedRegelkreis:
+    		regelkreis = note.getRegelkreis();
+    		handleUpdatedRegelkreis(regelkreis);
+    		break;
+    	}
+    }
+    
+    private void handleNewRegelkreis(Regelkreis regelkreis, DimensioningResult dimRes){
+    	initComplete = false;
     	smartLoopModel.output();
     	if (dimRes.getType() == Model.piRegler){
 			smartLoopView.setState(View.modifyPIState);
@@ -100,27 +127,41 @@ public class Controller implements Runnable, Observer {
 		}
     	
     	smartLoopView.updateSliderMaxValues(dimRes.getParamArray());
-    	updatePlot(smartLoopModel.getXValues(),smartLoopModel.getYValues());
+    	smartLoopView.addPlot(regelkreis);
+    	//updatePlot(smartLoopModel.getXValues(),smartLoopModel.getYValues());
     	initComplete = true;
     }
     
+    private void handleUpdatedRegelkreis(Regelkreis regelkreis){
+    	smartLoopView.updatePlot(regelkreis);
+    	System.out.println("updatedRegelkreis handled");
+    }
+    
     public void clearPressed(){
-    	smartLoopModel.removeRegelkreis(0);
+    	//smartLoopModel.removeRegelkreis(0);
     	smartLoopView.setState(View.initState);
     	smartLoopView.updateConsole("Neue Werte können eingegeben werden...");
     }
     
-    public void paramUpdated(int newValue, String param, boolean recalc){
+    public void deleteRegelkreis(int index){
+    	smartLoopModel.removeRegelkreis(index);
+    }
+    
+    public void deleteAllRegelkreise(){
+    	smartLoopModel.deleteAllRegelkreise();
+    }
+    
+    public void paramUpdated(int newValue, String param, int rkIndex, boolean recalc){
     	smartLoopView.updateParam((float)newValue / 1000.0, param);
     	if (initComplete) { //recalc && initComplete
     		System.out.println("==========Starting new SR Calculation=========");
-    		smartLoopModel.updateStepResponse(0, smartLoopView.getParamValues());
-    		updatePlot(smartLoopModel.getXValues(), smartLoopModel.getYValues());
+    		smartLoopModel.updateStepResponse(rkIndex, smartLoopView.getParamValues());
+    		//updatePlot(smartLoopModel.getXValues(), smartLoopModel.getYValues());
     	}
     }
     
-    public void optiSliderUpdated(int newValue){
-    	smartLoopModel.updateRegelkreis(((newValue / 1000.0) - Math.PI/2));
+    public void optiSliderUpdated(int newValue, int regelkreisIndex){
+    	smartLoopModel.updateRegelkreis(((newValue / 1000.0) - Math.PI/2), regelkreisIndex);
     }
     
 	// DEPRECIATED - DO NOT USE ANYMORE
@@ -145,7 +186,7 @@ public class Controller implements Runnable, Observer {
     	
     	krUpdated((int)(tfValues[0] * 1000.0));
     	tnUpdated((int)(tfValues[1] * 1000.0));
-    	if(smartLoopView.getState() == smartLoopView.modifyPIDState){
+    	if(smartLoopView.getState() == View.modifyPIDState){
     		tvUpdated((int)(tfValues[2] * 1000.0));
 			tpUpdated((int)(tfValues[3] * 1000.0));
     	}    		
