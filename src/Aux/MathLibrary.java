@@ -151,6 +151,7 @@ public class MathLibrary {
 		return result;
 	}
 	
+	// Nicht mehr benötigt?
 	public static Complex[] prepareForFFT(Complex[] fftVector){
 		int oldLength = fftVector.length;
 		int newLength = (int) Math.pow(2, FastMath.ceil(FastMath.log(2.0, oldLength)));
@@ -167,6 +168,18 @@ public class MathLibrary {
 	
 	public static int makePowOf2(int oldValue){
 		return (int) Math.pow(2, FastMath.ceil(FastMath.log(2.0, oldValue)));
+	}
+	
+	public static String scientificFormat(double input){
+		final int upperLimit = 100;
+		final double lowerLimit = 0.001;
+		final String numberFormat;
+		if (input > lowerLimit && input < upperLimit){
+			numberFormat = "%1$,.3f";
+		} else {
+			numberFormat = "%6.3e";
+		}
+		return String.format(numberFormat, input);
 	}
 
 	

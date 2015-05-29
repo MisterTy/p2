@@ -3,6 +3,7 @@ import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
+import Aux.MathLibrary;
 import Model.Model;
 import View.View;
 
@@ -132,22 +133,22 @@ public class TableModel extends AbstractTableModel {
 			if (heading){
 				return "Tu";
 			}
-			return String.format(View.numFormat, selectedPlot.regelkreis.getStrecke().getTu());
+			return MathLibrary.scientificFormat(selectedPlot.regelkreis.getStrecke().getTu());
 		} else if (row == 1){
 			if (heading){
 				return "Tg";
 			}
-			return String.format(View.numFormat, selectedPlot.regelkreis.getStrecke().getTg());
+			return MathLibrary.scientificFormat(selectedPlot.regelkreis.getStrecke().getTg());
 		} else if (row ==2){
 			if (heading) {
-				return "N";
+				return "Ordnung";
 			}
 			return String.valueOf(selectedPlot.regelkreis.getStrecke().getN());
 		} else {
 			if (heading){
 				return "T"+(row-2);
 			}
-			return String.format(View.numFormat, selectedPlot.regelkreis.getStrecke().getCoeffitients()[row-3]);
+			return MathLibrary.scientificFormat(selectedPlot.regelkreis.getStrecke().getCoeffitients()[row-3]);
 		}
 	}
 	
@@ -166,32 +167,32 @@ public class TableModel extends AbstractTableModel {
 			if(heading){
 				return "Ü'schwingen gewünscht";
 			}
-			return String.format(View.numFormat, selectedPlot.regelkreis.getWantedOvershoot())+"%";
+			return MathLibrary.scientificFormat(selectedPlot.regelkreis.getWantedOvershoot())+"%";
 		}else if (row == 2){
 			if (heading){
 				return "Ü'schwingen erreicht";
 			}
-			return String.format(View.numFormat,selectedPlot.regelkreis.getOvershoot())+"%";
+			return MathLibrary.scientificFormat(selectedPlot.regelkreis.getOvershoot())+"%";
 		} else if (row == 3){
 			if (heading){
 				return "Kr";
 			}
-			return String.format(View.numFormat, selectedPlot.regelkreis.getResult().getKr());
+			return MathLibrary.scientificFormat(selectedPlot.regelkreis.getResult().getKr());
 		} else if (row == 4){
 			if (heading){
 				return "Tn";
 			}
-			return String.format(View.numFormat, selectedPlot.regelkreis.getResult().getTn());
+			return MathLibrary.scientificFormat(selectedPlot.regelkreis.getResult().getTn());
 		} else if (row == 5){
 			if (heading) {
 				return "Tv";
 			}
-			return String.format(View.numFormat, selectedPlot.regelkreis.getResult().getTv());
+			return MathLibrary.scientificFormat(selectedPlot.regelkreis.getResult().getTv());
 		} else if (row == 6){
 			if (heading) {
 				return "Tp";
 			}
-			return String.format(View.numFormat, selectedPlot.regelkreis.getResult().getTp());
+			return MathLibrary.scientificFormat(selectedPlot.regelkreis.getResult().getTp());
 		} else {
 			return "error";
 		}

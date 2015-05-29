@@ -57,6 +57,7 @@ import org.jfree.data.xy.XYDatasetTableModel;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
+import Aux.MathLibrary;
 import Controller.ColorCellRenderer;
 import Controller.Controller;
 import Controller.PlotManager;
@@ -74,7 +75,7 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 	public static final int modifyPIState = 4;
 	
 	//public static final String numFormat = "%1$,.3f";
-	public static final String numFormat = "%6.3e";
+	//public static final String numFormat = "%6.3e";
 	
 	private int state = initState;
 	private boolean purging = false;
@@ -242,7 +243,7 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 				GridBagConstraints.SOUTH, GridBagConstraints.BOTH, new Insets(
 						0, 0, 0, 2), 0, 0));
 		add(managementPanel, new GridBagConstraints(1, 0, 1, 5, 0.0, 0.0,
-				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(
+				GridBagConstraints.NORTH, GridBagConstraints.BOTH, new Insets(
 						0, 0, 0, 0), 0, 0));
 		add(panel4, new GridBagConstraints(2, 0, 1, 5, 1.0, 1.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(
@@ -555,7 +556,7 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 				break;
 		}
 		if (updateSlider.getValue() != newValue.intValue()* 1000){
-			updateTf.setText(String.format(numFormat, newValue));
+			updateTf.setText(MathLibrary.scientificFormat(newValue));
 			updateSlider.setValue((int)(newValue * 1000.0));
 		}
 	}	
