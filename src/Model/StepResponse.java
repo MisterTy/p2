@@ -8,7 +8,7 @@ import org.apache.commons.math3.transform.TransformType;
 import org.apache.commons.math3.util.FastMath;
 import org.apache.commons.math3.util.MathArrays;
 
-import Aux.MathLibrary;
+import Auxillary.MathLibrary;
 
 
 public class StepResponse {

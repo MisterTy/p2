@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 import javax.swing.JFrame;
 
-import Aux.AutoTest;
+import Auxillary.AutoTest;
 import Controller.Controller;
 import Model.Model;
 

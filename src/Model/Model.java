@@ -5,8 +5,8 @@ import java.util.Observable;
 
 import org.apache.commons.math3.complex.Complex;
 
-import Aux.MathLibrary;
-import Aux.Notification;
+import Auxillary.MathLibrary;
+import Auxillary.Notification;
 
 /**
  * 
@@ -88,12 +88,14 @@ public class Model extends Observable {
     }
     
     public void updateStepResponse(int regelkreis, double[] params){
+    	System.out.println("Updating StepResponse...");
     	regelKreisListe.get(regelkreis).updateStepResponse(params, verstarkungStrecke, zeitkonstante, kreisFrequenzSpektrum);
     	Notification note = new Notification(Notification.updatedStepResponse);
     	note.setRegelkreis(regelKreisListe.get(regelkreis));
     	note.setDimensioningResult(note.getRegelkreis().getResult());
     	setChanged();
     	notifyObservers(note);
+    	System.out.println("Updated StepResponse");
     }
     
     public void removeRegelkreis(int regelkreis){

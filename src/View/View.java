@@ -57,7 +57,7 @@ import org.jfree.data.xy.XYDatasetTableModel;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import Aux.MathLibrary;
+import Auxillary.MathLibrary;
 import Controller.ColorCellRenderer;
 import Controller.Controller;
 import Controller.PlotManager;
@@ -73,9 +73,6 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 	public static final int calculatingState = 2;
 	public static final int modifyPIDState = 3;
 	public static final int modifyPIState = 4;
-	
-	//public static final String numFormat = "%1$,.3f";
-	//public static final String numFormat = "%6.3e";
 	
 	private int state = initState;
 	private boolean purging = false;
@@ -140,12 +137,10 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 	private JScrollPane streckenInfoScrollPane;
 	private JTable reglerInfoTable;
 	private JScrollPane reglerInfoScrollPane;
-	private JButton btPin = new JButton("Pin");
-	private JButton btNew = new JButton("Neu");
 	private JButton btDelete = new JButton("Löschen");
 	private JButton btDelAll = new JButton("Alle Löschen");
 	
-	private JTextField tfKonsole =new JTextField("Konsole...");
+	private Console console =new Console();
 	private JPanel panelLegende=new JPanel();
 	
 	private JFreeChart chart;
@@ -224,7 +219,7 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
         stepResponseTable.getSelectionModel().addListSelectionListener(this);
         stepResponseTable.getColumnModel().getColumn(0).setMinWidth(15);
         stepResponseTable.getColumnModel().getColumn(0).setMaxWidth(15);
-        reglerInfoTable.getColumnModel().getColumn(0).setMinWidth(105);
+        reglerInfoTable.getColumnModel().getColumn(0).setMinWidth(150);
         
 
 //--------------------------------------------------------------------------------------
@@ -366,13 +361,14 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		panel3Simple.add(sliderOpt, new GridBagConstraints(0, 1, 2, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(3, 0, 0, 0), 0, 0));
 		
-		Dimension dim = new Dimension(200, 130);
+		Dimension dim = new Dimension(230, 130);
+		Dimension riDim = new Dimension((int)dim.getWidth(), (int)dim.getHeight()+15);
 		stepResponseScrollPane.setMinimumSize(dim);
 		stepResponseScrollPane.setPreferredSize(dim);
 		streckenInfoScrollPane.setMinimumSize(dim);
 		streckenInfoScrollPane.setPreferredSize(dim);
-		reglerInfoScrollPane.setMinimumSize(dim);
-		reglerInfoScrollPane.setPreferredSize(dim);
+		reglerInfoScrollPane.setMinimumSize(riDim);
+		reglerInfoScrollPane.setPreferredSize(riDim);
 		
 		streckenInfoTable.setCellSelectionEnabled(false);
 		reglerInfoTable.setCellSelectionEnabled(false);
@@ -382,21 +378,17 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 10), 0, 0));
 		managementPanel.add(stepResponseScrollPane, new GridBagConstraints(0, 1, 2, 1, 0.0, 0.0,
 				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 0), 0, 0));
-		managementPanel.add(btPin, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+		managementPanel.add(btDelete, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
 				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 10), 0, 0));
-		managementPanel.add(btNew, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
+		managementPanel.add(btDelAll, new GridBagConstraints(1, 2, 1, 1, 0.0, 0.0,
 				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 10), 0, 0));
-		managementPanel.add(btDelete, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
+		managementPanel.add(lbReglerparameter, new GridBagConstraints(0, 3, 2, 1, 0.0, 0.0,
 				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 10), 0, 0));
-		managementPanel.add(btDelAll, new GridBagConstraints(1, 3, 1, 1, 0.0, 0.0,
-				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 10), 0, 0));
-		managementPanel.add(lbReglerparameter, new GridBagConstraints(0, 4, 2, 1, 0.0, 0.0,
-				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 10), 0, 0));
-		managementPanel.add(reglerInfoScrollPane, new GridBagConstraints(0, 5, 2, 1, 0.0, 0.0,
+		managementPanel.add(reglerInfoScrollPane, new GridBagConstraints(0, 4, 2, 1, 0.0, 0.0,
 				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 0), 0, 0));
-		managementPanel.add(lbStreckenparameter, new GridBagConstraints(0, 6, 2, 1, 0.0, 0.0,
+		managementPanel.add(lbStreckenparameter, new GridBagConstraints(0, 5, 2, 1, 0.0, 0.0,
 				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 10), 0, 0));
-		managementPanel.add(streckenInfoScrollPane, new GridBagConstraints(0, 7, 2, 1, 0.0, 0.0,
+		managementPanel.add(streckenInfoScrollPane, new GridBagConstraints(0, 6, 2, 1, 0.0, 0.0,
 				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 0), 0, 0));
 		
 		btDelete.addActionListener(this);
@@ -413,7 +405,7 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		tfTv.addActionListener(this);
 		tfTp.addActionListener(this);
 		
-		tfKonsole.setEditable(false);
+		console.setEditable(false);
 				
 		panel4.setLayout(new GridBagLayout());
 		panel4.add(chartPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
@@ -423,7 +415,7 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		
 //==> Legende
 		
-		panel4.add(tfKonsole, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
+		panel4.add(console, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		
 	
@@ -517,7 +509,6 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 			int selectedIndex = plotManager.getSelectedIndex();
 			actionHandler.optiSliderUpdated(sliderOpt.getValue(), selectedIndex);
 			stepResponseTable.setRowSelectionInterval(selectedIndex, selectedIndex);
-			
 		}
 	}
 	
@@ -569,7 +560,15 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 	}
 	
 	public void updateConsole(String text){
-		tfKonsole.setText(text);
+		console.log(text);
+	}
+	public void updateConsole(String text, int messageTyp){
+		console.log(text, messageTyp);
+	}
+	
+	public void invalidateInputFields(){
+		tfTg.invalidateField();
+		tfTu.invalidateField();
 	}
 	
 	public void addPlot(Regelkreis regelkreis){
@@ -578,17 +577,6 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		chartPanel.repaint();
 		chartPanel.restoreAutoBounds();
 		stepResponseTable.setRowSelectionInterval(index, index);
-	}
-	
-	public void addPlot(XYSeries data){
-		if(dataset.getSeriesIndex(data.getKey())==-1){
-			dataset.addSeries(data);
-			chartPanel.repaint();
-			chartPanel.restoreAutoBounds(); //Zoom zurücksetzen;
-		}
-		else{
-			System.out.println("Plot mit dem selben 'Key' schon vorhanden");
-		}
 	}
 	
 	public void removePlot(XYSeries data){
@@ -601,21 +589,6 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 	
 	public void updatePlot(Regelkreis regelkreis){
 		plotManager.updateSelectedPlot(regelkreis);
-	}
-	
-	//TODO Syso's entfernen...
-	 
-	public void updatePlot(XYSeries data){	
-		System.out.println("view updatePlot");
-		if(dataset.getSeriesIndex(data.getKey())==-1){
-			System.out.println("Plot nicht vorhanden neuser Plot wird erstellt");
-			addPlot(data);
-		}else{
-			System.out.println("Plot ersetzen..");
-			dataset.removeSeries(dataset.getSeries(data.getKey()));
-			dataset.addSeries(data);
-			System.out.println("Plot update done");
-		}
 	}
 	
 	

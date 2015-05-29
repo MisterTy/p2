@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 import javax.swing.table.AbstractTableModel;
 
-import Aux.MathLibrary;
+import Auxillary.MathLibrary;
 import Model.Model;
 import View.View;
 

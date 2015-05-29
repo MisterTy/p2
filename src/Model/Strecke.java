@@ -1,7 +1,7 @@
 package Model;
 import org.apache.commons.math3.complex.Complex;
 
-import Aux.SaniCalculator;
+import Auxillary.SaniCalculator;
 
 /**
  * 

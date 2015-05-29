@@ -12,11 +12,12 @@ import javax.swing.UIManager;
 
 import org.jfree.data.xy.XYSeries;
 
-import Aux.DimensioningResult;
-import Aux.Notification;
+import Auxillary.DimensioningResult;
+import Auxillary.Notification;
 import Model.Model;
 import Model.Regelkreis;
 import View.View;
+import View.Console;
 
 /**
  * Verwaltet eingaben, die druch das View gemacht werden.
@@ -81,28 +82,28 @@ public class Controller implements Runnable, Observer {
     		smartLoopModel.setStrecke(tuValue, tgValue);
     		smartLoopModel.setUberschwingen(Double.parseDouble(uberschwingen));;
     		smartLoopModel.setVerstarkung(kValue);
-    		System.out.println("Vor addRegelkreis");
     		smartLoopModel.addRegelkreis(type);	
     	}
     	else{
+    		smartLoopView.invalidateInputFields();
     		System.out.println("Somthing is wrong with entered values...");
     	}
     }
     
     public void update(Observable sender, Object args){
     	System.out.println("update called...............");
-    	initComplete = false;
-    	smartLoopView.updateConsole("Berechnete Werte werden ausgegeben");
     	
     	Notification note = (Notification) args;
     	Regelkreis regelkreis;
+    	DimensioningResult dimRes;
     	switch (note.getMessage()){
     	case Notification.newRegelkreis:
     		regelkreis = note.getRegelkreis();
-    		DimensioningResult dimRes = note.getDimensioningResult();
+    		dimRes = note.getDimensioningResult();
     		handleNewRegelkreis(regelkreis, dimRes);
+    		smartLoopView.updateConsole("Neuer Regelkreis berechnet", Console.success);
     		break;
-    	case Notification.updatedRegelkreis:
+    	case Notification.updatedRegelkreis: case Notification.updatedStepResponse:
     		regelkreis = note.getRegelkreis();
     		handleUpdatedRegelkreis(regelkreis);
     		break;
@@ -134,7 +135,6 @@ public class Controller implements Runnable, Observer {
     
     private void handleUpdatedRegelkreis(Regelkreis regelkreis){
     	smartLoopView.updatePlot(regelkreis);
-    	System.out.println("updatedRegelkreis handled");
     }
     
     public void clearPressed(){
@@ -164,20 +164,20 @@ public class Controller implements Runnable, Observer {
     	smartLoopModel.updateRegelkreis(((newValue / 1000.0) - Math.PI/2), regelkreisIndex);
     }
     
-	// DEPRECIATED - DO NOT USE ANYMORE
-    public void krUpdated(int newValue){
+
+    private void krUpdated(int newValue){
     	smartLoopView.updateParam((float)newValue / 1000.0, "kr");
     }
-    // DEPRECIATED - DO NOT USE ANYMORE
-    public void tnUpdated(int newValue){
+
+    private void tnUpdated(int newValue){
     	smartLoopView.updateParam((float)newValue / 1000.0, "tn");
     }
-    // DEPRECIATED - DO NOT USE ANYMORE
-    public void tvUpdated(int newValue){
+
+    private void tvUpdated(int newValue){
     	smartLoopView.updateParam((float)newValue / 1000.0, "tv");
     }
-    // DEPRECIATED - DO NOT USE ANYMORE
-    public void tpUpdated(int newValue){
+    
+    private void tpUpdated(int newValue){
     	smartLoopView.updateParam((float)newValue / 1000.0, "tp");
     }
     
@@ -210,45 +210,21 @@ public class Controller implements Runnable, Observer {
     	}
     	
 		if ( v > 0.64173) {
-			smartLoopView.updateConsole("Tu/Tg too great --> N would be greater than 8");
+			smartLoopView.updateConsole("Tu/Tg too great --> N would be greater than 8", Console.error);
 			return false;
 		}
 		else if (v < 0.001) {
-			smartLoopView.updateConsole("Tu/Tg too small --> N would be less than 1");
+			smartLoopView.updateConsole("Tu/Tg too small --> N would be less than 1", Console.error);
 			return false;
 		}
 		if (kValue < 0) {
-			smartLoopView.updateConsole("k must be positive");
+			smartLoopView.updateConsole("k must be positive", Console.error);
 			return false;
 		}
 		if (! pidState ^ piState) {
-			smartLoopView.updateConsole("Bitte einen Regelertyp auswählen");
+			smartLoopView.updateConsole("Bitte einen Regelertyp auswählen", Console.error);
 			return false;
 		}
 		return true;
-    }
- 
-    private void updatePlot(double[] xValues, double[] yValues){
-    	System.out.println("ctrl updatePlot");
-    	//System.out.println("X Werte: "+Arrays.toString(xValues));
-    	//System.out.println("Y Werte: "+Arrays.toString(yValues));
-    	XYSeries schrittantwort=new XYSeries("Schrittantwort "+(plotNummerierung));
-    	for (int i = 0; i < xValues.length; i++) {
-    		schrittantwort.add(xValues[i], yValues[i]);    		
-		}
-    	smartLoopView.updatePlot(schrittantwort);
-    }
-    
-    private void addPlot(){
-    	plotNummerierung++;
-    	System.out.println("ctrl addPlot"); /*
-    	XYSeries schrittantwort=null;
-    	System.out.println("adding Plot");
-    	plotNummerierung++;
-    	schrittantwort=new XYSeries("Schrittantwort "+plotNummerierung);   	
-    	for (int i = 0; i < xValues.length; i++) {
-    		schrittantwort.add(xValues[i], yValues[i]);    		
-		}
-    	smartLoopView.addPlot(schrittantwort);    	*/
     }
 }

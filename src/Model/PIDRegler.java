@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import org.apache.commons.math3.complex.Complex;
 
-import Aux.MathLibrary;
+import Auxillary.MathLibrary;
 
 /**
  * 

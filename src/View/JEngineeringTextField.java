@@ -175,4 +175,8 @@ public class JEngineeringTextField extends JTextField implements FocusListener {
 		timer.setRepeats(false);
 		timer.start();
 	}
+	
+	public void invalidateField(){
+		errorMsg();
+	}
 }

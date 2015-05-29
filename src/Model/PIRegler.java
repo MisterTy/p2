@@ -5,7 +5,7 @@ import java.util.*;
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.util.FastMath;
 
-import Aux.MathLibrary;
+import Auxillary.MathLibrary;
 
 /**
  * Diese Klasse berechnet die Parameter eines PI-Reglers nach dem Zellwegerverfahren.

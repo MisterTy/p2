@@ -5,8 +5,8 @@ import java.util.Arrays;
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.util.FastMath;
 
-import Aux.DimensioningResult;
-import Aux.MathLibrary;
+import Auxillary.DimensioningResult;
+import Auxillary.MathLibrary;
 
 /**
  * 
