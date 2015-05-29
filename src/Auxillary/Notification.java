@@ -1,4 +1,4 @@
-package Aux;
+package Auxillary;
 
 import Model.Regelkreis;
 

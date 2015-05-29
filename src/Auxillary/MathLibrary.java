@@ -1,4 +1,4 @@
-package Aux;
+package Auxillary;
 
 import java.util.*;
 
@@ -12,7 +12,7 @@ public class MathLibrary {
     
     /**
      * Methode sucht index eines Punktes (Phi) aus einem Double Array (phase).
-     * Gibt ein Integer Array zurück mit 2 Indexwerten, 
+     * Gibt ein Integer Array zur??ck mit 2 Indexwerten, 
      * index unterhalb (0) und oberhalb (1) des gesuchten Punktes.
      * @param phase
      * @param phi
@@ -34,7 +34,7 @@ public class MathLibrary {
     }
     
     /**
-     * Gibt eine linear unterteilte Werteliste als Double Array zurück, mit n Punkten
+     * Gibt eine linear unterteilte Werteliste als Double Array zur??ck, mit n Punkten
      * @param start
      * @param end
      * @param n
@@ -47,7 +47,7 @@ public class MathLibrary {
     }
     
 	/**
-	 * Gibt eine linear unterteilte Werteliste als Double Array zurück mit 100 Punkten
+	 * Gibt eine linear unterteilte Werteliste als Double Array zur??ck mit 100 Punkten
 	 * @param start
 	 * @param end
 	 * @return lineare Werteliste
@@ -60,7 +60,7 @@ public class MathLibrary {
     }
     
     /**
-     * Gibt eine Logarithmisch unterteile Werteliste von 10^start bis und mit 10^ende mit n Anzahl Punkten zurück.
+     * Gibt eine Logarithmisch unterteile Werteliste von 10^start bis und mit 10^ende mit n Anzahl Punkten zur??ck.
      * @param start
      * @param end
      * @param n
@@ -73,7 +73,7 @@ public class MathLibrary {
     }
     
     /**
-     * Gibt eine Logarithmisch unterteile Werteliste von 10^start bis und mit10^ende mit 100 Punkten zurück
+     * Gibt eine Logarithmisch unterteile Werteliste von 10^start bis und mit10^ende mit 100 Punkten zur??ck
      * @param start
      * @param end
      * @return Werteliste
@@ -85,7 +85,7 @@ public class MathLibrary {
     	
     }
     /**
-     * Sucht den groessten Wert aus einem Array und gibt diesen zurück
+     * Sucht den groessten Wert aus einem Array und gibt diesen zur??ck
      * 
      * @param werte
      * @return Maximalwert
@@ -96,7 +96,7 @@ public class MathLibrary {
 		return maximalwert;
 	}
 	/**
-	 * Sucht den kleinsten Wert aus einem Array und gibt diesen zurück
+	 * Sucht den kleinsten Wert aus einem Array und gibt diesen zur??ck
 	 * @param werte
 	 * @return
 	 */
@@ -107,7 +107,7 @@ public class MathLibrary {
 	}
 	
 	/**
-	 * Berechnet den Frequenzgang aus Zaehler und Nennerpolynom und gibt diesen zurück
+	 * Berechnet den Frequenzgang aus Zaehler und Nennerpolynom und gibt diesen zur??ck
 	 * @param b
 	 * @param a
 	 * @param w
@@ -119,7 +119,7 @@ public class MathLibrary {
 		for (int k = 0; k < res.length; k++) {
 			Complex jw = new Complex(0,w[k]);
 			
-			if (jw.equals(Complex.ZERO)){		// für omega==0 
+			if (jw.equals(Complex.ZERO)){		// f??r omega==0 
 				res[k] = new Complex(b[b.length-1] / a[a.length-1], 0);
 			} else {
 				Complex zaehler = new Complex(0, 0);
@@ -138,7 +138,7 @@ public class MathLibrary {
 	}
 	
 	/**
-	 * Erzeugt ein eindimesionales Array, jeweils gefüllt mit dem Wert 1.
+	 * Erzeugt ein eindimesionales Array, jeweils gef??llt mit dem Wert 1.
 	 * 
 	 * @param anzSpalten
 	 * @return EinerArray
@@ -151,7 +151,7 @@ public class MathLibrary {
 		return result;
 	}
 	
-	// Nicht mehr benötigt?
+	// Nicht mehr ben??tigt?
 	public static Complex[] prepareForFFT(Complex[] fftVector){
 		int oldLength = fftVector.length;
 		int newLength = (int) Math.pow(2, FastMath.ceil(FastMath.log(2.0, oldLength)));

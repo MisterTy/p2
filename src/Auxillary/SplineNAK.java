@@ -1,4 +1,4 @@
-package Aux;
+package Auxillary;
 // Source: http://www.pcs.cnu.edu/~bbradie/cpp/interp.C
 
 public class SplineNAK {

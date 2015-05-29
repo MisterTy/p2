@@ -1,4 +1,4 @@
-package Aux;
+package Auxillary;
 
 public class DimensioningResult {
 	private double kr;
