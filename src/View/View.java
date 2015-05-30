@@ -139,9 +139,10 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 	private JScrollPane reglerInfoScrollPane;
 	private JButton btDelete = new JButton("Löschen");
 	private JButton btDelAll = new JButton("Alle Löschen");
+	private JPanel freeSpacePanel =new JPanel();
+	
 	
 	private Console console =new Console();
-	private JPanel panelLegende=new JPanel();
 	
 	private JFreeChart chart;
     private XYSeriesCollection dataset;
@@ -373,6 +374,8 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		streckenInfoTable.setCellSelectionEnabled(false);
 		reglerInfoTable.setCellSelectionEnabled(false);
 		
+		freeSpacePanel.setBackground(Color.LIGHT_GRAY);
+		
 		managementPanel.setLayout(new GridBagLayout());
 		managementPanel.add(lbSchrittantworten, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0,
 				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 10), 0, 0));
@@ -389,6 +392,8 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		managementPanel.add(lbStreckenparameter, new GridBagConstraints(0, 5, 2, 1, 0.0, 0.0,
 				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 10), 0, 0));
 		managementPanel.add(streckenInfoScrollPane, new GridBagConstraints(0, 6, 2, 1, 0.0, 0.0,
+				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 0), 0, 0));
+		managementPanel.add(freeSpacePanel, new GridBagConstraints(0, 7, 2, 1, 0.0, 1.0,
 				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 0), 0, 0));
 		
 		btDelete.addActionListener(this);
