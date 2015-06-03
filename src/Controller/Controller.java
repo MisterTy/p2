@@ -67,9 +67,6 @@ public class Controller implements Runnable, Observer {
     
     public void berechnenPressed(double tuValue, double tgValue, double kValue, boolean pidState, boolean piState, String uberschwingen){
     	if (validateValues(tuValue, tgValue, kValue, pidState, piState)){
-    		System.out.println("before addPlot");
-    		//addPlot();
-    		System.out.println("after addPlot");
     		smartLoopView.setState(View.calculatingState);
     		//smartLoopView.updateConsole("Berechnung gestartet");
     		int type = Model.pidRegler;
@@ -86,13 +83,10 @@ public class Controller implements Runnable, Observer {
     	}
     	else{
     		smartLoopView.invalidateInputFields();
-    		System.out.println("Somthing is wrong with entered values...");
     	}
     }
     
     public void update(Observable sender, Object args){
-    	System.out.println("update called...............");
-    	
     	Notification note = (Notification) args;
     	Regelkreis regelkreis;
     	DimensioningResult dimRes;
@@ -103,9 +97,17 @@ public class Controller implements Runnable, Observer {
     		handleNewRegelkreis(regelkreis, dimRes);
     		smartLoopView.updateConsole("Neuer Regelkreis berechnet", Console.success);
     		break;
-    	case Notification.updatedRegelkreis: case Notification.updatedStepResponse:
+    	case Notification.updatedRegelkreis:
     		regelkreis = note.getRegelkreis();
-    		handleUpdatedRegelkreis(regelkreis);
+    		smartLoopView.updatePlot(regelkreis);
+    		smartLoopView.updateOptiSlider(regelkreis.getKkfRaw());
+        	checkSanity(regelkreis);
+        	updateParamValues(regelkreis.getResult().getParamArray());
+    		break;
+    	case Notification.updatedStepResponse:
+    		regelkreis = note.getRegelkreis();
+    		checkSanity(regelkreis);
+    		smartLoopView.updatePlot(regelkreis);
     		break;
     	}
     }
@@ -133,10 +135,6 @@ public class Controller implements Runnable, Observer {
     	initComplete = true;
     }
     
-    private void handleUpdatedRegelkreis(Regelkreis regelkreis){
-    	smartLoopView.updatePlot(regelkreis);
-    }
-    
     public void clearPressed(){
     	//smartLoopModel.removeRegelkreis(0);
     	smartLoopView.setState(View.initState);
@@ -145,51 +143,46 @@ public class Controller implements Runnable, Observer {
     
     public void deleteRegelkreis(int index){
     	smartLoopModel.removeRegelkreis(index);
+    	if (smartLoopModel.getAnzRegelkreise() == 0){
+    		smartLoopView.setState(View.initState);
+    	}
     }
     
     public void deleteAllRegelkreise(){
     	smartLoopModel.deleteAllRegelkreise();
+    	smartLoopView.setState(View.initState);
     }
     
     public void paramUpdated(int newValue, String param, int rkIndex, boolean recalc){
     	smartLoopView.updateParam((float)newValue / 1000.0, param);
     	if (initComplete) { //recalc && initComplete
-    		System.out.println("==========Starting new SR Calculation=========");
     		smartLoopModel.updateStepResponse(rkIndex, smartLoopView.getParamValues());
     		//updatePlot(smartLoopModel.getXValues(), smartLoopModel.getYValues());
     	}
     }
     
     public void optiSliderUpdated(int newValue, int regelkreisIndex){
-    	smartLoopModel.updateRegelkreis(((newValue / 1000.0) - Math.PI/2), regelkreisIndex);
+    	double kkf = (newValue / 1000.0) - Math.PI/2;
+    	if (smartLoopModel.updateNecessary(regelkreisIndex, kkf)){
+    		smartLoopModel.updateRegelkreis(kkf, regelkreisIndex);
+    	}
     }
     
-
-    private void krUpdated(int newValue){
-    	smartLoopView.updateParam((float)newValue / 1000.0, "kr");
-    }
-
-    private void tnUpdated(int newValue){
-    	smartLoopView.updateParam((float)newValue / 1000.0, "tn");
-    }
-
-    private void tvUpdated(int newValue){
-    	smartLoopView.updateParam((float)newValue / 1000.0, "tv");
-    }
-    
-    private void tpUpdated(int newValue){
-    	smartLoopView.updateParam((float)newValue / 1000.0, "tp");
+    public void updateParamValues(double[] paramValues){
+    	initComplete = false;
+    	
+    	smartLoopView.updateParam(paramValues[0], "kr");
+    	smartLoopView.updateParam(paramValues[1], "tn");
+    	if (smartLoopView.getState() == View.modifyPIDState){
+    		smartLoopView.updateParam(paramValues[2], "tv");
+        	smartLoopView.updateParam(paramValues[3], "tp");
+    	}
+    	initComplete = true;
     }
     
     public void tfValuesChanged(double[] tfValues){
-    	smartLoopView.updateSliderMaxValues(tfValues);   
-    	
-    	krUpdated((int)(tfValues[0] * 1000.0));
-    	tnUpdated((int)(tfValues[1] * 1000.0));
-    	if(smartLoopView.getState() == View.modifyPIDState){
-    		tvUpdated((int)(tfValues[2] * 1000.0));
-			tpUpdated((int)(tfValues[3] * 1000.0));
-    	}    		
+    	smartLoopView.updateSliderMaxValues(tfValues);
+    	updateParamValues(tfValues);  
     }
     /**
      * ��berpr��ft ob die Werte f��r Tu, Tg und k plausibel sind.
@@ -226,5 +219,23 @@ public class Controller implements Runnable, Observer {
 			return false;
 		}
 		return true;
+    }
+    
+    private void checkSanity(Regelkreis regelkreis){
+    	boolean insane = false;
+    	double[] paramValues = regelkreis.getResult().getParamArray();
+    	for (int i=0; i<paramValues.length; i++){
+    		if (paramValues[i]<0 || paramValues[i]>100){
+    			insane = true;
+    		}
+    	}
+    	if (regelkreis.getOvershoot() < 0 || regelkreis.getOvershoot() > 100){
+    		insane = true;
+    	}
+    	if (insane){
+    		smartLoopView.updateConsole("Warnung: Regelkreis ist möglicherweise instabil", Console.warning);
+    	} else{
+    		smartLoopView.clearConsole();
+    	}
     }
 }

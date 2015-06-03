@@ -48,6 +48,7 @@ public class Console extends JTextField {
 			setBackground(msgColor);
 			setForeground(Color.white);
 			log(msg);
+			displayingError = true;
 			
 			javax.swing.Timer timer = new javax.swing.Timer(3000,
 					new ActionListener() {
@@ -55,6 +56,7 @@ public class Console extends JTextField {
 						public void actionPerformed(ActionEvent e) {
 							setBackground(color);
 							setForeground(textColor);
+							displayingError = false;
 						}
 					});
 			

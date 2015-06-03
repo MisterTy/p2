@@ -17,7 +17,7 @@ import javax.swing.JTextField;
  * whether the entered value is in a specified range.
  * </pre>
  * 
- * @author Simon Zumbrunnen
+ * @author Simon Zumbrunnen, Timon Ziltener
  */
 
 public class JEngineeringTextField extends JTextField implements FocusListener {

@@ -47,6 +47,10 @@ public class PlotManager{
 		return dataset;
 	}
 	
+	public Plot getSelectedPlot(){
+		return plotList.get(selectedIndex);
+	}
+	
 	
 	// ---------- Setters ----------
 	
@@ -60,7 +64,7 @@ public class PlotManager{
 		Plot plot = new Plot();
 		plot.regelkreis = regelkreis;
 		plot.id = ++idCounter;
-		plot.name = "Schrittantwort "+plot.id;
+		plot.name = "Regelkreis "+plot.id;
 		XYSeries data = new XYSeries(plot.id);
 		double[] xValues = regelkreis.getXValues();
 		double[] yValues = regelkreis.getYValues();
@@ -76,7 +80,6 @@ public class PlotManager{
 		plotList.add(plot);
 		stepResponseTableModel.addItem(plot);
 		stepResponseTableModel.fireTableDataChanged();
-		System.out.println("new Plot with index: "+plotList.indexOf(plot)+" plotList length: "+plotList.size());
 		return plotList.indexOf(plot);
 	}
 	
@@ -96,10 +99,11 @@ public class PlotManager{
 		
 		if (plotList.size() == 0){
 			selectedIndex = -1;
+			streckenInfoTableModel.setSelectedPlot(null);
+			reglerInfoTableModel.setSelectedPlot(null);
 		} else if (selectedIndex != 0) {
 			selectedIndex -= 1;
 		}
-		System.out.println("Removed Plot: "+selectedPlot.id+" new selectedIndex: "+selectedIndex);
 		return selectedIndex;
 	}
 	
@@ -116,7 +120,6 @@ public class PlotManager{
 	
 	public void updateSelectedPlot(Regelkreis regelkreis){
 		Plot selectedPlot = plotList.get(selectedIndex);
-		System.out.println("updating plot: "+selectedPlot.id+" Series: "+selectedPlot.seriesIndex);
 		Plot newPlot = new Plot();
 		newPlot.regelkreis = regelkreis;
 		newPlot.id = selectedPlot.id;

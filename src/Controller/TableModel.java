@@ -203,4 +203,12 @@ public class TableModel extends AbstractTableModel {
 	    return typ == PlotManager.stepResponseTable;
 	  }
 
+	@Override
+	public void setValueAt(Object aValue, int rowIndex, int columnIndex)
+	   {
+		Plot changedPlot = plots.get(rowIndex);
+		changedPlot.name = (String) aValue;
+		updateItem(changedPlot, rowIndex);
+	   }
+
 }

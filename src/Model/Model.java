@@ -74,10 +74,10 @@ public class Model extends Observable {
     public void updateRegelkreis(double kkfOffset, int regelkreisIndex){
     	int n = strecke.getN();
     	double modifier = n / 25.0;
-    	System.out.println("modifier: "+modifier);
-    	kkfOffset *= modifier;
+    	modifier *= kkfOffset;
     	Regelkreis oldRegelkreis = regelKreisListe.get(regelkreisIndex);
-    	Regelkreis newRegelkreis = new Regelkreis(oldRegelkreis.getTyp(), strecke, kreisFrequenzSpektrum, uberschwingen, verstarkungStrecke, zeitkonstante, kkfOffset);
+    	Regelkreis newRegelkreis = new Regelkreis(oldRegelkreis.getTyp(), strecke, kreisFrequenzSpektrum, uberschwingen, verstarkungStrecke, zeitkonstante, modifier);
+    	newRegelkreis.setKkfRaw(kkfOffset);
     	removeRegelkreis(regelkreisIndex);
     	regelKreisListe.add(regelkreisIndex, newRegelkreis);
     	Notification note = new Notification(Notification.updatedRegelkreis);
@@ -88,14 +88,20 @@ public class Model extends Observable {
     }
     
     public void updateStepResponse(int regelkreis, double[] params){
-    	System.out.println("Updating StepResponse...");
     	regelKreisListe.get(regelkreis).updateStepResponse(params, verstarkungStrecke, zeitkonstante, kreisFrequenzSpektrum);
     	Notification note = new Notification(Notification.updatedStepResponse);
     	note.setRegelkreis(regelKreisListe.get(regelkreis));
     	note.setDimensioningResult(note.getRegelkreis().getResult());
     	setChanged();
     	notifyObservers(note);
-    	System.out.println("Updated StepResponse");
+    }
+    
+    public boolean updateNecessary(int regelkreis, double kkfRaw){
+    	if (regelKreisListe.get(regelkreis).getKkfRaw() != kkfRaw){
+    		return true;
+    	} else {
+    		return false;
+    	}
     }
     
     public void removeRegelkreis(int regelkreis){
@@ -105,6 +111,10 @@ public class Model extends Observable {
     public void deleteAllRegelkreise(){
     	regelKreisListe.clear();
     	strecke = null;
+    }
+    
+    public int getAnzRegelkreise(){
+    	return regelKreisListe.size();
     }
     
     public void output(){

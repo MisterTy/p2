@@ -40,6 +40,7 @@ import javax.swing.JSlider;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
@@ -69,7 +70,8 @@ import Model.Regelkreis;
 public class View extends JPanel implements ActionListener, ChangeListener, FocusListener, ListSelectionListener {
 	private static final long serialVersionUID = 1L;
 	
-	public static final int initState = 1;
+	public static final int initState = 0;
+	public static final int recalcState = 1;
 	public static final int calculatingState = 2;
 	public static final int modifyPIDState = 3;
 	public static final int modifyPIState = 4;
@@ -99,8 +101,7 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 	
 	private JToggleButton btPID =new JToggleButton("PID");
 	private JToggleButton btPI =new JToggleButton("PI");
-	private JButton btClear =new JButton("Clear");
-	private JButton btBerechnen =new JButton("Berechnen");
+	private JButton btBerechnen =new JButton("Regelkreis hinzufügen");
 	private ButtonGroup btGroup =new ButtonGroup();
 	
 	private JLabel lbUeberschwingen=new JLabel("Überschwingen");
@@ -139,10 +140,9 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 	private JScrollPane reglerInfoScrollPane;
 	private JButton btDelete = new JButton("Löschen");
 	private JButton btDelAll = new JButton("Alle Löschen");
-	private JPanel freeSpacePanel =new JPanel();
-	
 	
 	private Console console =new Console();
+	private JPanel panelLegende=new JPanel();
 	
 	private JFreeChart chart;
     private XYSeriesCollection dataset;
@@ -163,7 +163,6 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		btSipmle.setSelected(true);
 		
 		btBerechnen.addActionListener(this);
-		btClear.addActionListener(this);
 		
 		tfTu.setMaxValue(100);
 		tfTu.setMinValue(0);
@@ -217,10 +216,12 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
         
         //stepResponseTable.setDefaultRenderer(Object.class, new ColorCellRenderer(plotManager));
         //stepResponseTable.getSelectionModel().addListSelectionListener(plotManager);
+        stepResponseTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         stepResponseTable.getSelectionModel().addListSelectionListener(this);
         stepResponseTable.getColumnModel().getColumn(0).setMinWidth(15);
         stepResponseTable.getColumnModel().getColumn(0).setMaxWidth(15);
-        reglerInfoTable.getColumnModel().getColumn(0).setMinWidth(150);
+        reglerInfoTable.getColumnModel().getColumn(0).setMinWidth(100);
+        reglerInfoTable.getColumnModel().getColumn(0).setPreferredWidth(150);
         
 
 //--------------------------------------------------------------------------------------
@@ -234,7 +235,7 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 						0, 0, 0, 2), 0, 0));
 		add(panel6, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(
-						2, 0, 2, 2), 0, 0));
+						2, 0, 0, 2), 0, 0));
 		add(panel3Simple, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
 				GridBagConstraints.SOUTH, GridBagConstraints.BOTH, new Insets(
 						0, 0, 0, 2), 0, 0));
@@ -271,10 +272,8 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		
 		btPID.setPreferredSize(new Dimension(50, 25));
 		btPI.setPreferredSize(new Dimension(50, 25));
-		btClear.setMinimumSize(new Dimension(90, 25));
-		btBerechnen.setMinimumSize(new Dimension(90, 25));
-		btClear.setPreferredSize(new Dimension(90, 25));
-		btBerechnen.setPreferredSize(new Dimension(90, 25));
+		btBerechnen.setMinimumSize(new Dimension(180, 25));
+		btBerechnen.setPreferredSize(new Dimension(180, 25));
 		
 		
 
@@ -292,10 +291,8 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 				GridBagConstraints.LINE_START, GridBagConstraints.NONE, new Insets(3, 10, 0, 0), 0, 0));
 		panel2.add(tfOver, new GridBagConstraints(1, 1, 2, 1, 1.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(3, 0, 0, 0), 0, 0));
-		panel2.add(btClear, new GridBagConstraints(0, 4, 1, 1, 1.0, 0.0,
-				GridBagConstraints.LINE_END, GridBagConstraints.NONE, new Insets(3, 0, 0, 0), 0, 0));
-		panel2.add(btBerechnen, new GridBagConstraints(1, 4, 1, 1, 1.0, 0.0,
-				GridBagConstraints.LINE_START, GridBagConstraints.NONE, new Insets(3, 0, 0, 0), 0, 0));
+		panel2.add(btBerechnen, new GridBagConstraints(0, 4, 2, 1, 1.0, 0.0,
+				GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(10, 0, 0, 0), 0, 0));
 				
 		btSipmle.addActionListener(this);
 		btExpert.addActionListener(this);
@@ -355,6 +352,7 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		sliderOpt.setPreferredSize(new Dimension(150, 25));
 		sliderOpt.setMinimumSize(new Dimension(150, 25));
 		sliderOpt.addChangeListener(this);
+		sliderOpt.setEnabled(false);
 		
 		panel3Simple.setLayout(new GridBagLayout());
 		panel3Simple.add(lbOpt, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0,
@@ -374,8 +372,6 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		streckenInfoTable.setCellSelectionEnabled(false);
 		reglerInfoTable.setCellSelectionEnabled(false);
 		
-		freeSpacePanel.setBackground(Color.LIGHT_GRAY);
-		
 		managementPanel.setLayout(new GridBagLayout());
 		managementPanel.add(lbSchrittantworten, new GridBagConstraints(0, 0, 2, 1, 0.0, 0.0,
 				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 10), 0, 0));
@@ -393,11 +389,11 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 10), 0, 0));
 		managementPanel.add(streckenInfoScrollPane, new GridBagConstraints(0, 6, 2, 1, 0.0, 0.0,
 				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 0), 0, 0));
-		managementPanel.add(freeSpacePanel, new GridBagConstraints(0, 7, 2, 1, 0.0, 1.0,
-				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 0), 0, 0));
 		
 		btDelete.addActionListener(this);
 		btDelAll.addActionListener(this);
+		btDelete.setEnabled(false);
+		btDelAll.setEnabled(false);
 		
 		
 
@@ -457,10 +453,6 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		if (eventSource == btBerechnen){
 			actionHandler.berechnenPressed(tfTu.getValue(), tfTg.getValue(), tfk.getValue(), btPID.isSelected(), btPI.isSelected(),tfOver.getText());
 		
-		} else if (eventSource == btClear){
-//			dataset.removeAllSeries();
-			actionHandler.clearPressed();
-			
 		} else if(eventSource==tfKr||eventSource==tfTn||eventSource==tfTv||eventSource==tfTp){
 			double[] eingabe=new double[4];
 			eingabe[0]=Double.parseDouble(tfKr.getText());
@@ -494,6 +486,9 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 			purging = true;
 			plotManager.removeAllPlots();
 			actionHandler.deleteAllRegelkreise();
+			setState(View.initState);
+			btDelete.setEnabled(false);
+			btDelAll.setEnabled(false);
 			purging = false;
 		}
 	}
@@ -555,7 +550,14 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 			updateTf.setText(MathLibrary.scientificFormat(newValue));
 			updateSlider.setValue((int)(newValue * 1000.0));
 		}
-	}	
+	}
+	
+	public void updateOptiSlider(double newValue){
+		newValue = (newValue+Math.PI/2)*1000;
+		if (sliderOpt.getValue() != (int)newValue){
+			sliderOpt.setValue((int)newValue);
+		}
+	}
 	
 	public void updateSliderMaxValues(double[] MaxValues){
 		sliderKr.setMaximum((int)(MaxValues[0]*2000.0));
@@ -571,6 +573,12 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		console.log(text, messageTyp);
 	}
 	
+	public void clearConsole(){
+		if(!console.getText().equals("")){
+			console.log("");
+		}
+	}
+	
 	public void invalidateInputFields(){
 		tfTg.invalidateField();
 		tfTu.invalidateField();
@@ -582,14 +590,6 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		chartPanel.repaint();
 		chartPanel.restoreAutoBounds();
 		stepResponseTable.setRowSelectionInterval(index, index);
-	}
-	
-	public void removePlot(XYSeries data){
-		dataset.removeSeries(dataset.getSeries(data.getKey()));
-	}
-	
-	public void removeAllPlots(){
-		dataset.removeAllSeries();
 	}
 	
 	public void updatePlot(Regelkreis regelkreis){
@@ -615,14 +615,6 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		state = newState;
 		switch (state){
 			case initState:
-				tfTu.setEnabled(true);
-				tfTg.setEnabled(true);
-				tfk.setEnabled(true);
-				tfOver.setEnabled(true);
-				btClear.setEnabled(false);
-				btBerechnen.setEnabled(true);
-				btPID.setEnabled(true);
-				btPI.setEnabled(true);
 				sliderKr.setEnabled(false);
 				sliderTn.setEnabled(false);
 				sliderTv.setEnabled(false);
@@ -631,17 +623,12 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 				tfTn.setEnabled(false);
 				tfTv.setEnabled(false);
 				tfTp.setEnabled(false);
+				btDelete.setEnabled(false);
+				btDelAll.setEnabled(false);
+				sliderOpt.setEnabled(false);
 				break;
 				
 			case calculatingState:
-				tfTu.setEnabled(false);
-				tfTg.setEnabled(false);
-				tfk.setEnabled(false);
-				tfOver.setEnabled(false);
-				btClear.setEnabled(true);
-				btBerechnen.setEnabled(false);
-				btPID.setEnabled(false);
-				btPI.setEnabled(false);
 				sliderKr.setEnabled(false);
 				sliderTn.setEnabled(false);
 				sliderTv.setEnabled(false);
@@ -650,17 +637,12 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 				tfTv.setEnabled(false);
 				tfTn.setEnabled(false);
 				tfTp.setEnabled(false);
+				btDelete.setEnabled(false);
+				btDelAll.setEnabled(false);
+				sliderOpt.setEnabled(false);
 				break;
 				
 			case modifyPIDState:
-				tfTu.setEnabled(false);
-				tfTg.setEnabled(false);
-				tfk.setEnabled(false);
-				tfOver.setEnabled(false);
-				btClear.setEnabled(true);
-				btBerechnen.setEnabled(false);
-				btPID.setEnabled(false);
-				btPI.setEnabled(false);
 				sliderKr.setEnabled(true);
 				sliderTn.setEnabled(true);
 				sliderTv.setEnabled(true);
@@ -669,17 +651,12 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 				tfTn.setEnabled(true);
 				tfTv.setEnabled(true);
 				tfTp.setEnabled(true);
+				btDelete.setEnabled(true);
+				btDelAll.setEnabled(true);
+				sliderOpt.setEnabled(true);
 				break;
 				
 			case modifyPIState:
-				tfTu.setEnabled(false);
-				tfTg.setEnabled(false);
-				tfk.setEnabled(false);
-				tfOver.setEnabled(false);
-				btClear.setEnabled(true);
-				btBerechnen.setEnabled(false);
-				btPID.setEnabled(false);
-				btPI.setEnabled(false);
 				sliderKr.setEnabled(true);
 				sliderTn.setEnabled(true);
 				sliderTv.setEnabled(false);
@@ -688,6 +665,9 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 				tfTn.setEnabled(true);
 				tfTv.setEnabled(false);
 				tfTp.setEnabled(false);
+				btDelete.setEnabled(true);
+				btDelAll.setEnabled(true);
+				sliderOpt.setEnabled(true);
 				break;
 		}
 	}
@@ -706,6 +686,8 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 	public void valueChanged(ListSelectionEvent e) {
 		if (!purging){
 			plotManager.valueChanged(e);
+			actionHandler.updateParamValues(plotManager.getSelectedPlot().regelkreis.getResult().getParamArray());
+			updateOptiSlider(plotManager.getSelectedPlot().regelkreis.getKkfRaw());
 		}
 	}
 

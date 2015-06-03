@@ -20,6 +20,7 @@ public class Regelkreis {
 	private double overshoot;
 	private double oldOvershoot;
 	private double precision = 0.00001;
+	private double kkfRaw = 0;
 	private Strecke strecke;
 	private Complex[] utfStrecke;
 
@@ -70,9 +71,7 @@ public class Regelkreis {
         		klMerker = true;
         	}
         	counter++;
-        	System.out.println("Current Overshoot: "+overshoot+" Wanted Overshoot: "+wantedOvershoot);
     	}
-    	System.out.println("Optimisation took "+counter+" iterations.");
     	dimensioningResult = regler.getResult();
     }
     
@@ -92,7 +91,6 @@ public class Regelkreis {
 				break;
 	    }
     	kkf += kkfOffset;
-    	System.out.println("kkf: "+kkf);
     	regler.setValues(utfStrecke, kreisFrequenzSpektrum, phasenrand, verstarkungStrecke, zeitkonstante, kkf);
 		regler.compute();
     	double[] params = regler.getResult().getParamArray();
@@ -103,14 +101,21 @@ public class Regelkreis {
     	double[] yValues = getYValues();
     	double maximum = MathLibrary.findMax(yValues);
     	double endwert = 1;//yValues[yValues.length-1];
-    	System.out.println("Overshoot calculation: max:"+maximum+" endwert: "+endwert);
-    	overshoot = (maximum-endwert)/endwert*100;
+    	overshoot = (maximum-1)*100;
     	return overshoot;
     }
     
     public void updateStepResponse(double[] params, double verstarkungStrecke, double[] zeitkonstante, double[]kreisFrequenzSpektrum){
     	stepResponse.calc(regler.getTyp(), params, verstarkungStrecke, zeitkonstante, kreisFrequenzSpektrum, true);
     	dimensioningResult.setValues(regler.getTyp(), params[0], params[1], params[2], params[3]);
+    	calcOvershoot();
+    }
+    
+    public void setKkfRaw(double kkfRaw){
+    	this.kkfRaw = kkfRaw;
+    }
+    public double getKkfRaw(){
+    	return kkfRaw;
     }
     
     public int getTyp(){

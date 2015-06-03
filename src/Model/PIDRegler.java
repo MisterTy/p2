@@ -1,7 +1,5 @@
 package Model;
 
-import java.util.Arrays;
-
 import org.apache.commons.math3.complex.Complex;
 
 import Auxillary.MathLibrary;
