@@ -1,21 +1,19 @@
 package Auxillary;
 
-import java.util.*;
-
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.util.FastMath;
 
 /**
- * 
+ * Bibliothek mit Berechnugsfunktionen (Die Meisten sind equivalent zu Matlabfunktionen)
  */
 public class MathLibrary {
     
     /**
      * Methode sucht index eines Punktes (Phi) aus einem Double Array (phase).
-     * Gibt ein Integer Array zur??ck mit 2 Indexwerten, 
+     * Gibt ein Integer Array zurueck mit 2 Indexwerten, 
      * index unterhalb (0) und oberhalb (1) des gesuchten Punktes.
-     * @param phase
-     * @param phi
+     * @param phase Phasengang
+     * @param phi Winkel
      * @return [unterer Index, oberer Index]
      */
     public static int[] int_ver(double[] phase,double phi){
@@ -34,20 +32,22 @@ public class MathLibrary {
     }
     
     /**
-     * Gibt eine linear unterteilte Werteliste als Double Array zur??ck, mit n Punkten
+     * Gibt eine linear unterteilte Werteliste als Double Array zurueck, mit n Punkten
+     * - Ersetzt Matlabfunktion linspace()
      * @param start
      * @param end
-     * @param n
+     * @param n Anzahl Werte
      * @return lineare Werteliste
      */
     public static double[] linspace(double start,double end,int n){
     	double space[] =new double[n];    	
     	for(int i = 0;i<n;i++) space[i]=start+i*(end-start)/(n-1);
-   		return space;   	
+   		return space;   
     }
     
 	/**
-	 * Gibt eine linear unterteilte Werteliste als Double Array zur??ck mit 100 Punkten
+	 * Gibt eine linear unterteilte Werteliste als Double Array zurueck mit 100 Punkten
+	 * - Ersetzt Matlabfunktion linspace()
 	 * @param start
 	 * @param end
 	 * @return lineare Werteliste
@@ -60,10 +60,11 @@ public class MathLibrary {
     }
     
     /**
-     * Gibt eine Logarithmisch unterteile Werteliste von 10^start bis und mit 10^ende mit n Anzahl Punkten zur??ck.
+     * Gibt eine Logarithmisch unterteile Werteliste von 10^start bis und mit 10^ende mit n Anzahl Punkten zurueck.
+     * - Ersetzt Matlabfunktion logspace()
      * @param start
      * @param end
-     * @param n
+     * @param n Anzahl Werte
      * @return Werteliste
      */
     public static double[] logspace(double start,double end,int n){
@@ -73,7 +74,8 @@ public class MathLibrary {
     }
     
     /**
-     * Gibt eine Logarithmisch unterteile Werteliste von 10^start bis und mit10^ende mit 100 Punkten zur??ck
+     * Gibt eine Logarithmisch unterteile Werteliste von 10^start bis und mit10^ende mit 100 Punkten zurueck
+     * - Ersetzt Matlabfunktion logspace
      * @param start
      * @param end
      * @return Werteliste
@@ -85,9 +87,10 @@ public class MathLibrary {
     	
     }
     /**
-     * Sucht den groessten Wert aus einem Array und gibt diesen zur??ck
+     * Sucht den groessten Wert aus einem Array und gibt diesen zurueck
+     * - Ersetzt Matlabfunktion max()
      * 
-     * @param werte
+     * @param werte Liste aus der der maximalwert gesucht wird.
      * @return Maximalwert
      */
 	public static double findMax(double[] werte){
@@ -96,9 +99,11 @@ public class MathLibrary {
 		return maximalwert;
 	}
 	/**
-	 * Sucht den kleinsten Wert aus einem Array und gibt diesen zur??ck
-	 * @param werte
-	 * @return
+	 * Sucht den kleinsten Wert aus einem Array und gibt diesen zurueck
+	 * - Ersetzt Matlabfunktion min()
+	 * 
+	 * @param werte Werteliste aus der der Minimalwert gesucht wird.
+	 * @return Minimalwert
 	 */
 	public static double findMin(double[] werte){
 		double maximalwert=werte[0];
@@ -107,10 +112,13 @@ public class MathLibrary {
 	}
 	
 	/**
-	 * Berechnet den Frequenzgang aus Zaehler und Nennerpolynom und gibt diesen zur??ck
-	 * @param b
-	 * @param a
-	 * @param w
+	 * Berechnet den Frequenzgang aus Zaehler und Nennerpolynom und gibt diesen zurueck
+	 *
+	 * - Ersetzt Matlabfunktion freqs()
+	 * 
+	 * @param b Zählerpolynom
+	 * @param a Nennerpolynom
+	 * @param w Frequenzenliste
 	 * @return Frequenzgang
 	 */
 	public static final Complex[] freqs(double[] b, double[] a, double[] w) {
@@ -138,10 +146,11 @@ public class MathLibrary {
 	}
 	
 	/**
-	 * Erzeugt ein eindimesionales Array, jeweils gef??llt mit dem Wert 1.
+	 * Erzeugt ein eindimesionales Array, jeweils gefuellt mit dem Wert 1.
+	 * - Ersetzt Matlabfunktion ones()
 	 * 
-	 * @param anzSpalten
-	 * @return EinerArray
+	 * @param anzSpalten, Anzahl Elemente des erzeugten Arrays
+	 * @return EinerArray 
 	 */
 	public static double[] ones(int anzSpalten){
 		double[] result = new double[anzSpalten];
@@ -151,8 +160,9 @@ public class MathLibrary {
 		return result;
 	}
 	
-	// Nicht mehr ben??tigt?
-	public static Complex[] prepareForFFT(Complex[] fftVector){
+	//TODO Nicht mehr benoetigt?
+	
+/*	public static Complex[] prepareForFFT(Complex[] fftVector){
 		int oldLength = fftVector.length;
 		int newLength = (int) Math.pow(2, FastMath.ceil(FastMath.log(2.0, oldLength)));
 		Complex[] result = new Complex[newLength];
@@ -164,12 +174,23 @@ public class MathLibrary {
 			}
 		}
 		return result;
-	}
+	}*/
 	
+	/**
+	 * Diese Funktion rundet auf die nächste 2er Potenz auf.
+	 * 
+	 * @param oldValue Eingabewert
+	 * @return auf naechste 2er Potenz gerundeter Wert
+	 */
 	public static int makePowOf2(int oldValue){
 		return (int) Math.pow(2, FastMath.ceil(FastMath.log(2.0, oldValue)));
 	}
 	
+	/**
+	 * Wandelt Zahl in Engineering Format um.
+	 * @param input
+	 * @return Formatierte Nummer
+	 */
 	public static String scientificFormat(double input){
 		final int upperLimit = 100;
 		final double lowerLimit = 0.001;

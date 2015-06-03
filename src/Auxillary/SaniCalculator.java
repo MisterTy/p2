@@ -1,11 +1,5 @@
 package Auxillary;
 
-import org.apache.commons.math3.*; //TODO Reduce Import to include only the needed packages (streamlining)
-import org.apache.commons.math3.analysis.interpolation.SplineInterpolator;
-import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
-
-import java.util.Arrays;
-import java.util.Scanner;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,19 +13,19 @@ public class SaniCalculator {
 	private double[][] tuTg = new double[8][50];
 	private double[][] tTg = new double[8][50];
 
+	/**
+	 * Berechnet die Strecke anhand der Sani Methode
+	 * @param tu
+	 * @param tg
+	 */
 	public void saniCalculation(double tu, double tg) {
 		loadArrays();
 		
         if (verifyInput(tu, tg)){
-        	//System.out.println("starting sani calculation with Tu = " + tu + ", Tg = " + tg);
         	double v = calculateV(tu, tg);
         	n = calculateN(v);
         	t = splineInterpolation(tg, n, v);
-        	//System.out.println("finnished sani calculation.\nThe results are:");
-        	//System.out.println("\tN is "+n);
-        	//System.out.println("\n\tT is "+Arrays.toString(t));
         }
-
 	}
 	
 	public int getN(){
@@ -42,8 +36,11 @@ public class SaniCalculator {
 		return t;
 	}
 	
+	/**
+	 * Liest die Arrays zur streckenberechnung aus
+	 * @return Erfolgreich:1, Nicht erfolgreich:0
+	 */
 	private int loadArrays() {
-		//System.out.println("Loading stored arrays TuTg and tTg ...");
 		final String[] files = new String[2];
 		files[0] = "./lib/T_Tg.csv";
 		files[1] = "./lib/Tu_Tg.csv";
@@ -70,8 +67,7 @@ public class SaniCalculator {
 						else {
 							tuTg[i][j] = value;
 						}
-					}
-					
+					}				
 				}
 			}
 			catch (IOException x) {
@@ -82,6 +78,12 @@ public class SaniCalculator {
 		return 1;
 	}
 	
+	/**
+	 * Die Methode ueberprüft, ob die Eingabewerte eine Gueltige Strecke geben.
+	 * @param tu 
+	 * @param tg
+	 * @return  1 wenn Gültig 0 wenn ungültig
+	 */
 	private boolean verifyInput(double tu, double tg) {
 		if (tu <= 0 || tg <= 0) {
 			System.out.println("Values must be greater than 0");
@@ -95,8 +97,7 @@ public class SaniCalculator {
 			}
 			else if (v < 0.001) {
 				System.out.println("Tu/Tg too small --> N would be less than 1");
-				return false;
-				
+				return false;				
 			}
 			else {
 				return true;	
@@ -104,10 +105,21 @@ public class SaniCalculator {
 		}
 	}
 	
+	/**
+	 * Berechnet aus den Werten Tu und Tg das Verhältnis v
+	 * @param tu
+	 * @param tg
+	 * @return Verhältnis
+	 */
 	private double calculateV(double tu, double tg){
 		return tu / tg;
 	}
 	
+	/**
+	 * Berechnet aus dem Verhältnis V den Grad der Strecke. 
+	 * @param v Verhältnis aus Tu und Tg
+	 * @return Grad der Strecke
+	 */
 	private int calculateN(double v) {
 		int n = -1;
 		if (v <= 0.103638) {
@@ -134,61 +146,37 @@ public class SaniCalculator {
 		else {
 			n = 10;
 		}
-		//System.out.println("\tv is "+v);
-		//System.out.println("\tN is "+n);
 		return n;
 	}
 	
+	/**
+	 *  Führt eine Cubicspline Interpolation durch.
+	 * @param tg
+	 * @param n Anzahl Punkte
+	 * @param v
+	 * @return
+	 */
 	private double[] splineInterpolation(double tg, int n, double v) {
 		
 		double[] li = MathLibrary.linspace(0, 1, 50);
-		//System.out.println();
 		
-		//---------------- Old Spline Stuff ----------------
-		//SplineInterpolator splineInterpolator = new SplineInterpolator();
-		//PolynomialSplineFunction splineFunction = splineInterpolator.interpolate(tuTg[n-1], li);
-		//double r = splineFunction.value(v);
-		
-		//System.out.println("\tr is "+r);
-		
-		//splineFunction = splineInterpolator.interpolate(li, tTg[n-1]);
-		//double w = splineFunction.value(r);
-		
-		//System.out.println("\tw is "+w);
-		
-		
-		//---------------- New Spline Stuff ----------------
 		double[] linearTerms = new double[50];
 		double[] quadraticTerms = new double[50];
 		double[] cubicTerms = new double[50];
+		
 		SplineNAK.cubic_nak(50, tuTg[n-1], li, linearTerms, quadraticTerms, cubicTerms);
 		double r = SplineNAK.spline_eval(50, tuTg[n-1], li, linearTerms, quadraticTerms, cubicTerms, v);
-
-		//System.out.println("\trNew is "+r);
-		
 		SplineNAK.cubic_nak(50, li, tTg[n-1], linearTerms, quadraticTerms, cubicTerms);
-		double w = SplineNAK.spline_eval(50, li, tTg[n-1], linearTerms, quadraticTerms, cubicTerms, r);
-		
-		//System.out.println("\twNew is "+w);
-		
-		//---------------- Set to Matlab Values for testing  ----------------
-		//r = 0.839347581202894;
-		//w = 0.243907499851280;
-		
+		double w = SplineNAK.spline_eval(50, li, tTg[n-1], linearTerms, quadraticTerms, cubicTerms, r);		
 		double[] result = new double[n];
+		
 		result[n-1] = w*tg;
-		//System.out.println(Arrays.toString(result));
-		//System.out.println();
 		
 		for (int i = n-2; i >= 0; i--) {
 			result[i] = result[n-1]*Math.pow(r, n-i-1);
-			//System.out.println(n-i-1);
-			//System.out.println(Math.pow(r, n-i-1));
-			//System.out.println(Arrays.toString(result));
-			//System.out.println();
+
 		}
-		return result;
-		
+		return result;		
 	}
 
 }
