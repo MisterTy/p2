@@ -147,6 +147,7 @@ public class Regelkreis {
     }
     
     public double getOvershoot(){
+    	if(overshoot<0) overshoot=0;
     	return overshoot;
     }
     

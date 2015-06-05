@@ -172,7 +172,11 @@ public class TableModel extends AbstractTableModel {
 			if (heading){
 				return "Ü'schwingen erreicht";
 			}
-			return MathLibrary.scientificFormat(selectedPlot.regelkreis.getOvershoot())+"%";
+			if(selectedPlot.regelkreis.getOvershoot()==0){
+				return "Aperiodisch";
+			}else{
+				return MathLibrary.scientificFormat(selectedPlot.regelkreis.getOvershoot())+"%";
+			}
 		} else if (row == 3){
 			if (heading){
 				return "Kr";
