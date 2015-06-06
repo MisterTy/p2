@@ -387,7 +387,7 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 0), 0, 0));
 		managementPanel.add(lbStreckenparameter, new GridBagConstraints(0, 5, 2, 1, 0.0, 0.0,
 				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 10), 0, 0));
-		managementPanel.add(streckenInfoScrollPane, new GridBagConstraints(0, 6, 2, 1, 0.0, 0.0,
+		managementPanel.add(streckenInfoScrollPane, new GridBagConstraints(0, 6, 2, 1, 0.0, 1.0,
 				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 0), 0, 0));
 		
 		btDelete.addActionListener(this);
@@ -677,8 +677,7 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 	@Override
 	public void focusGained(FocusEvent e) {
 		// TODO Auto-generated method stub
-		
-	}
+		}
 
 
 
