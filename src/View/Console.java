@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JTextField;
 
 /**
- * Ueberarbeitetes Textfeld mit Farbverwaltung
+ * Ueberarbeitetes Textfeld zur Ausgabe von Rückmeldungen an den Benutzer
  * 
  */
 public class Console extends JTextField {

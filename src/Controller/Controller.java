@@ -10,8 +10,6 @@ import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
-import org.jfree.data.xy.XYSeries;
-
 import Auxillary.DimensioningResult;
 import Auxillary.Notification;
 import Model.Model;
@@ -65,10 +63,9 @@ public class Controller implements Runnable, Observer {
     }
     
     
-    public void berechnenPressed(double tuValue, double tgValue, double kValue, boolean pidState, boolean piState, String uberschwingen){
+    public void berechnenPressed(double tuValue, double tgValue, double kValue, boolean pidState, boolean piState, double uberschwingen){
     	if (validateValues(tuValue, tgValue, kValue, pidState, piState)){
     		smartLoopView.setState(View.calculatingState);
-    		//smartLoopView.updateConsole("Berechnung gestartet");
     		int type = Model.pidRegler;
     		if (piState){
     			type = Model.piRegler;
@@ -77,7 +74,7 @@ public class Controller implements Runnable, Observer {
     		// Start Calculations
     		smartLoopModel.setAnzahlPunkte(1000);
     		smartLoopModel.setStrecke(tuValue, tgValue);
-    		smartLoopModel.setUberschwingen(Double.parseDouble(uberschwingen));;
+    		smartLoopModel.setUberschwingen(uberschwingen);
     		smartLoopModel.setVerstarkung(kValue);
     		smartLoopModel.addRegelkreis(type);	
     	}
@@ -114,7 +111,6 @@ public class Controller implements Runnable, Observer {
     
     private void handleNewRegelkreis(Regelkreis regelkreis, DimensioningResult dimRes){
     	initComplete = false;
-    	smartLoopModel.output();
     	if (dimRes.getType() == Model.piRegler){
 			smartLoopView.setState(View.modifyPIState);
 			smartLoopView.updateParam(dimRes.getKr(), "kr");
@@ -131,12 +127,10 @@ public class Controller implements Runnable, Observer {
     	
     	smartLoopView.updateSliderMaxValues(dimRes.getParamArray());
     	smartLoopView.addPlot(regelkreis);
-    	//updatePlot(smartLoopModel.getXValues(),smartLoopModel.getYValues());
     	initComplete = true;
     }
     
     public void clearPressed(){
-    	//smartLoopModel.removeRegelkreis(0);
     	smartLoopView.setState(View.initState);
     	smartLoopView.updateConsole("Neue Werte können eingegeben werden...");
     }
@@ -153,11 +147,10 @@ public class Controller implements Runnable, Observer {
     	smartLoopView.setState(View.initState);
     }
     
-    public void paramUpdated(int newValue, String param, int rkIndex, boolean recalc){
+    public void paramUpdated(int newValue, String param, int rkIndex){
     	smartLoopView.updateParam((float)newValue / 1000.0, param);
-    	if (initComplete) { //recalc && initComplete
+    	if (initComplete) {
     		smartLoopModel.updateStepResponse(rkIndex, smartLoopView.getParamValues());
-    		//updatePlot(smartLoopModel.getXValues(), smartLoopModel.getYValues());
     	}
     }
     
@@ -180,9 +173,13 @@ public class Controller implements Runnable, Observer {
     	initComplete = true;
     }
     
-    public void tfValuesChanged(double[] tfValues){
-    	smartLoopView.updateSliderMaxValues(tfValues);
-    	updateParamValues(tfValues);  
+    public void tfValuesChanged(double[] tfValues, int rkIndex){
+    	if (initComplete) {
+    		System.out.println(Arrays.toString(tfValues));
+    		updateParamValues(tfValues);
+    		smartLoopView.updateSliderMaxValues(tfValues);
+    		smartLoopModel.updateStepResponse(rkIndex, tfValues);
+    	}  
     }
     /**
      * ��berpr��ft ob die Werte f��r Tu, Tg und k plausibel sind.

@@ -1,5 +1,4 @@
 package Model;
-import java.util.Arrays;
 
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
@@ -33,15 +32,13 @@ public class StepResponse {
 		double [] aR;
 		double [] bR;
 		
-		aST = new double[zeitKonstantenStrecke.length][2]; 			//Speicher die Terme (1+sT1)(1+sT2)(1+sT3).....(1+sTn)
+		aST = new double[zeitKonstantenStrecke.length][2]; 			//Speichert die Terme (1+sT1)(1+sT2)(1+sT3).....(1+sTn)
 		temp = new double[1];
 		temp[0] = 1;
-		//System.out.println("tmp: "+Arrays.toString(tmp));
 		for (int i = 0; i < zeitKonstantenStrecke.length; i++) {
 			aST[i][0] = zeitKonstantenStrecke[i];
 			aST[i][1] = 1;
 			temp = MathArrays.convolve(temp, aST[i]);					//(1+sT1)(1+sT2)(1+sT3).....(1+sTn) falten
-			//System.out.println("aST["+i+"]: "+Arrays.toString(aST[i])+" tmp: "+Arrays.toString(tmp));
 		}
 		aS= temp;				//Nennerpolyonom Strecke
 		bS[0] = streckenbeiwert;	//Z�hlerpolyonom Strecke	
@@ -71,8 +68,6 @@ public class StepResponse {
 			aR[0] = reglerParameter[1]*reglerParameter[3]; //s^2*Tn*Tp
 			this.b = MathArrays.convolve(bS, bR);// B(s)
 			this.a = MathArrays.convolve(aS, aR);// A(s)
-			//System.out.println("aR: "+Arrays.toString(aR)+" aS: "+Arrays.toString(aS));
-			//System.out.println("bR: "+Arrays.toString(bR)+" bS: "+Arrays.toString(bS));
 			break;
 		}
 		
@@ -85,7 +80,6 @@ public class StepResponse {
 				a[i] = a[i]+b[i-(a.length-b.length)];
 			}
 		}
-		//System.out.println("a: "+Arrays.toString(a)+" b: "+Arrays.toString(b));
 		
 		//Vorebereitung fuer FFT
 		if (initial)		//Nur bei �nderung des Sliders soll ws und N neu berechnet werden
@@ -95,15 +89,14 @@ public class StepResponse {
 			for (int i = 0; i < kreisFrequenzspektrum.length; i++) {
 				amplG_tmp[i] =  FastMath.log10(freqG_tmp[i].abs())*20;				//Berrechnung des Amplitudengangs
 			}
-			//System.out.println("Adb: "+Arrays.toString(amplG_tmp)+"length: "+(amplG_tmp.length));
 
 			int [] indeces = MathLibrary.int_ver(amplG_tmp, -20.0);
-			//System.out.println("index: "+Arrays.toString(indeces));
-			//int factor = -10 * zeitKonstantenStrecke.length + 88;
-			double factor = -1.25 * zeitKonstantenStrecke.length + 18.5;
-			ws = factor*(kreisFrequenzspektrum[indeces[0]] + kreisFrequenzspektrum[indeces[1]]) / 2; // was 20
-			//ws = kreisFrequenzspektrum[kreisFrequenzspektrum.length-1];
-			//n = (int)FastMath.pow(2, FastMath.ceil(FastMath.log(2, indeces[1])));
+			if (indeces[0] == amplG_tmp.length || indeces [1] == amplG_tmp.length){
+				ws = kreisFrequenzspektrum[kreisFrequenzspektrum.length-1];
+			} else {
+				double factor = -1.25 * zeitKonstantenStrecke.length + 18.5;
+				ws = factor*(kreisFrequenzspektrum[indeces[0]] + kreisFrequenzspektrum[indeces[1]]) / 2;
+			}
 			n = (int)FastMath.pow(2, FastMath.ceil(FastMath.log(2, kreisFrequenzspektrum.length)));
 		}
 		

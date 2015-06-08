@@ -1,6 +1,5 @@
 package Model;
 
-import java.util.*;
 
 import org.apache.commons.math3.complex.Complex;
 
@@ -8,8 +7,6 @@ import Auxillary.DimensioningResult;
 
 /**
  * Diese Klasse enthält das Grundgerüst für den PI und PID Regler 
- *
- *
  */
 public class GenericRegler {
 	public int reglerTyp = 0;

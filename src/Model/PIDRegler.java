@@ -8,6 +8,7 @@ import Auxillary.MathLibrary;
  * Diese Klasse berechnet die Parameter eines PID-Reglers nach dem Zellwegerverfahren.
  * Diese Dimensionierung erfolgt aufgrund einer Regelstrecke, deren Übertragungsfunktion
  * (Verstärkung und Zeitkonstanten)bekannt ist.
+ * 
  */
 public class PIDRegler extends GenericRegler {
 
@@ -83,8 +84,6 @@ public class PIDRegler extends GenericRegler {
     	phi_go = sprungEntfernen(phi_go);
     	int[] indecesWd = MathLibrary.int_ver(phi_go, -Math.PI + phir);
     	int leftIndexWd = indecesWd[0];
-    	int rightIndexWd = indecesWd[1];
-    	//double wD = (w[leftIndexWd] + w[rightIndexWd]) / 2;
     	double wD = w[leftIndexWd];
     	
     	// Krk bestimmen

@@ -1,4 +1,5 @@
 package Controller;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.util.ArrayList;
 
@@ -151,6 +152,9 @@ public class PlotManager{
 	// ---------- Listener Methods ----------
 	public void valueChanged(ListSelectionEvent e) {
 		if (!e.getValueIsAdjusting()){
+			
+			int oldSeriesIndex = plotList.get(selectedIndex).seriesIndex;
+			
 			if (e.getFirstIndex() == selectedIndex){
 				selectedIndex = e.getLastIndex();
 			} else if (e.getLastIndex() == selectedIndex){
@@ -158,7 +162,12 @@ public class PlotManager{
 			} else if (e.getFirstIndex() == e.getLastIndex()){
 				selectedIndex = e.getFirstIndex();
 			}
+			
 			Plot selectedPlot = plotList.get(selectedIndex);
+			
+			renderer.setSeriesStroke(oldSeriesIndex, new BasicStroke(1.0f));
+			renderer.setSeriesStroke(selectedPlot.seriesIndex, new BasicStroke(3.0f));
+			
 			streckenInfoTableModel.setSelectedPlot(selectedPlot);
 			reglerInfoTableModel.setSelectedPlot(selectedPlot);
 			streckenInfoTableModel.fireTableDataChanged();

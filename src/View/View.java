@@ -1,48 +1,24 @@
 package View;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.Polygon;
-import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionAdapter;
-import java.awt.event.MouseMotionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.EventObject;
 
-import javax.imageio.ImageIO;
-import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -50,18 +26,15 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartFrame;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.data.general.DefaultPieDataset;
-import org.jfree.data.xy.XYDatasetTableModel;
-import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 import Auxillary.MathLibrary;
 import Controller.ColorCellRenderer;
 import Controller.Controller;
 import Controller.PlotManager;
+import Model.Model;
 import Model.Regelkreis;
 
 
@@ -104,8 +77,8 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 	private JButton btBerechnen =new JButton("Regelkreis hinzufügen");
 	private ButtonGroup btGroup =new ButtonGroup();
 	
-	private JLabel lbUeberschwingen=new JLabel("Überschwingen");
-	private JFormattedDoubleTextField tfOver = new JFormattedDoubleTextField(0);
+	private JLabel lbUeberschwingen=new JLabel("Überschwingen in %");
+	private JEngineeringTextField tfOver = new JEngineeringTextField(0);
 	
 	private JLabel lbKr=new JLabel("Kr: ");
 	private JFormattedDoubleTextField tfKr =new JFormattedDoubleTextField(0);
@@ -142,7 +115,6 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 	private JButton btDelAll = new JButton("Alle Löschen");
 	
 	private Console console =new Console();
-	private JPanel panelLegende=new JPanel();
 	
 	private JFreeChart chart;
     private XYSeriesCollection dataset;
@@ -164,20 +136,15 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		
 		btBerechnen.addActionListener(this);
 		
-		tfTu.setMaxValue(100);
 		tfTu.setMinValue(0);
 		tfTu.setEmptyAllowed(false);
 		
-		tfTg.setMaxValue(100);
 		tfTg.setMinValue(0);
 		tfTg.setEmptyAllowed(false);
 		
 		tfk.setMaxValue(100);
 		tfk.setMinValue(0);
 		tfk.setEmptyAllowed(false);
-	
-	
-//*****************************************************************************		
 		
 		dataset = plotManager.getDataset();
 		chart = ChartFactory.createXYLineChart(" ", "Zeit", "Amplitude", dataset);
@@ -203,8 +170,6 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
         streckenInfoScrollPane = new JScrollPane(streckenInfoTable);
         reglerInfoScrollPane = new JScrollPane(reglerInfoTable);
         
-        //stepResponseTable.setDefaultRenderer(Object.class, new ColorCellRenderer(plotManager));
-        //stepResponseTable.getSelectionModel().addListSelectionListener(plotManager);
         stepResponseTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         stepResponseTable.getSelectionModel().addListSelectionListener(this);
         stepResponseTable.getColumnModel().getColumn(0).setMinWidth(15);
@@ -256,17 +221,16 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 				GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, ins1, 0, 0));
 		
 		
-		tfOver.setMaxValue(100);
-		tfOver.setMinValue(0.0005);
+		tfOver.setMaxValue(40);
+		tfOver.setMinValue(0);
+		tfOver.setMinimumSize(new Dimension(50, 25));
+		tfOver.setPreferredSize(new Dimension(50, 25));
 		
 		btPID.setPreferredSize(new Dimension(50, 25));
 		btPI.setPreferredSize(new Dimension(50, 25));
 		btBerechnen.setMinimumSize(new Dimension(180, 25));
 		btBerechnen.setPreferredSize(new Dimension(180, 25));
-		
-		
 
-		
 
 		panel2.setMinimumSize(new Dimension(200,130));
 		panel2.setPreferredSize(new Dimension(200,130));
@@ -279,7 +243,7 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		panel2.add(lbUeberschwingen, new GridBagConstraints(0, 1, 2, 1, 1.0, 0.0,
 				GridBagConstraints.LINE_START, GridBagConstraints.NONE, new Insets(3, 10, 0, 0), 0, 0));
 		panel2.add(tfOver, new GridBagConstraints(1, 1, 2, 1, 1.0, 0.0,
-				GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(3, 0, 0, 0), 0, 0));
+				GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(3, 5, 0, 0), 0, 0));
 		panel2.add(btBerechnen, new GridBagConstraints(0, 4, 2, 1, 1.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.NONE, new Insets(10, 0, 0, 0), 0, 0));
 				
@@ -296,8 +260,10 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		sliderTp.setPreferredSize(new Dimension(150, 25));
 		sliderTp.setMinimumSize(new Dimension(150, 25));
 		
-		
-		
+		sliderKr.setMaximum(1);
+		sliderTn.setMaximum(1);
+		sliderTv.setMaximum(1);
+		sliderTp.setMaximum(1);
 		
 		sliderKr.addChangeListener(this);
 		sliderTn.addChangeListener(this);
@@ -372,11 +338,11 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 10), 0, 0));
 		managementPanel.add(lbReglerparameter, new GridBagConstraints(0, 3, 2, 1, 0.0, 0.0,
 				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 10), 0, 0));
-		managementPanel.add(reglerInfoScrollPane, new GridBagConstraints(0, 4, 2, 1, 0.0, 0.0,
+		managementPanel.add(reglerInfoScrollPane, new GridBagConstraints(0, 4, 2, 1, 0.0, 1.0,
 				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 0), 0, 0));
 		managementPanel.add(lbStreckenparameter, new GridBagConstraints(0, 5, 2, 1, 0.0, 0.0,
 				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 10), 0, 0));
-		managementPanel.add(streckenInfoScrollPane, new GridBagConstraints(0, 6, 2, 1, 0.0, 1.0,
+		managementPanel.add(streckenInfoScrollPane, new GridBagConstraints(0, 6, 2, 1, 0.0, 0.0,
 				GridBagConstraints.PAGE_START, GridBagConstraints.BOTH, new Insets(3, 3, 3, 0), 0, 0));
 		
 		btDelete.addActionListener(this);
@@ -403,7 +369,6 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		panel4.add(console, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		
-	
 		panel1.setBackground(Color.white);
 		panel2.setBackground(Color.white);
 		panel3.setBackground(Color.white);
@@ -422,95 +387,12 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		tfTg.setValue(30.8);
 		tfk.setValue(0.5);
 		btPID.setSelected(true);
-		tfOver.setText("20");
+		tfOver.setValue(20);
 		//-----------------------------------------------------------------------------------------------
-		
-		
-		
-	}
 
-
-
-	/**
-	 * Wird bei einem ActionEvent ausgeführt
-	 * Action listener wurden be allen Buttons und 
-	 */
-	public void actionPerformed(ActionEvent e) {
-		Object eventSource = e.getSource();
-		if (eventSource == btBerechnen){
-			actionHandler.berechnenPressed(tfTu.getValue(), tfTg.getValue(), tfk.getValue(), btPID.isSelected(), btPI.isSelected(),tfOver.getText());
-		
-		} else if(eventSource==tfKr||eventSource==tfTn||eventSource==tfTv||eventSource==tfTp){
-			double[] eingabe=new double[4];
-			eingabe[0]=Double.parseDouble(tfKr.getText());
-			eingabe[1]=Double.parseDouble(tfTn.getText());
-			eingabe[2]=Double.parseDouble(tfTv.getText());
-			eingabe[3]=Double.parseDouble(tfTp.getText());
-			actionHandler.tfValuesChanged(eingabe);
-			
-		} else if(eventSource==btSipmle)
-		{
-			remove(panel3);
-			add(panel3Simple, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
-					GridBagConstraints.SOUTH, GridBagConstraints.BOTH, new Insets(
-							0, 0, 0, 2), 0, 0));
-			updateUI();		
-			
-		} else if(eventSource==btExpert)
-		{
-			remove(panel3Simple);
-			add(panel3, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
-					GridBagConstraints.SOUTH, GridBagConstraints.BOTH, new Insets(
-							0, 0, 0, 2), 0, 0));
-			updateUI();		
-		} else if (eventSource == btDelete){
-			actionHandler.deleteRegelkreis(plotManager.getSelectedIndex());
-			int index = plotManager.removeSelectedPlot();
-			if (index >= 0){
-				stepResponseTable.setRowSelectionInterval(index, index);
-			}
-		} else if (eventSource == btDelAll){
-			purging = true;
-			plotManager.removeAllPlots();
-			actionHandler.deleteAllRegelkreise();
-			setState(View.initState);
-			btDelete.setEnabled(false);
-			btDelAll.setEnabled(false);
-			purging = false;
-		}
 	}
 	
-	public void stateChanged(ChangeEvent e){
-		JSlider eventSource = (JSlider)e.getSource();
-		boolean recalc = ! eventSource.getValueIsAdjusting();
-		int index = plotManager.getSelectedIndex();
-		if (eventSource == sliderKr){			
-			actionHandler.paramUpdated(sliderKr.getValue(), "kr", index, recalc);
-		} else if (eventSource == sliderTn) {
-			actionHandler.paramUpdated(sliderTn.getValue(), "tn", index, recalc);
-		} else if (eventSource == sliderTv) {
-			actionHandler.paramUpdated(sliderTv.getValue(), "tv", index, recalc);
-		} else if (eventSource == sliderTp) {
-			actionHandler.paramUpdated(sliderTp.getValue(), "tp", index, recalc);
-		}else if(eventSource == sliderOpt){
-			int selectedIndex = plotManager.getSelectedIndex();
-			actionHandler.optiSliderUpdated(sliderOpt.getValue(), selectedIndex);
-			stepResponseTable.setRowSelectionInterval(selectedIndex, selectedIndex);
-		}
-	}
-	
-	public void focusLost(FocusEvent e) {
-		double[] eingabe=new double[4];
-		eingabe[0]=Double.parseDouble(tfKr.getText());
-		eingabe[1]=Double.parseDouble(tfTn.getText());
-		eingabe[2]=Double.parseDouble(tfTv.getText());
-		eingabe[3]=Double.parseDouble(tfTp.getText());
-		actionHandler.tfValuesChanged(eingabe);
-	}
-	
-	public void setActionHandler(Controller actionHandler){
-		this.actionHandler = actionHandler;
-	}
+	// ---------- Gui-Update Methods ----------
 	
 	public void updateParam(Double newValue, String param){
 		JSlider updateSlider = sliderKr;
@@ -551,16 +433,30 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 	 * @param MaxValues Maximalwerte
 	 */
 	public void updateSliderMaxValues(double[] MaxValues){
-		sliderKr.setMaximum((int)(MaxValues[0]*2000.0));
-		sliderTn.setMaximum((int)(MaxValues[1]*2000.0));
-		sliderTv.setMaximum((int)(MaxValues[2]*2000.0));
-		sliderTp.setMaximum((int)(MaxValues[3]*2000.0));
+		if (sliderKr.getMaximum() < MaxValues[0]*2000){
+			sliderKr.setMaximum((int)(MaxValues[0]*2000.0));
+		}
+		if (sliderTn.getMaximum() < MaxValues[1]*2000){
+			sliderTn.setMaximum((int)(MaxValues[1]*2000.0));
+		}
+		if (sliderTv.getMaximum() < MaxValues[2]*2000){
+			sliderTv.setMaximum((int)(MaxValues[2]*2000.0));
+		}
+		if (sliderTp.getMaximum() < MaxValues[3]*2000){
+			sliderTp.setMaximum((int)(MaxValues[3]*2000.0));
+		}
 	}
+	
+	public void invalidateInputFields(){
+		tfTg.invalidateField();
+		tfTu.invalidateField();
+	}
+	
+	// ---------- Console Methods ----------
 	
 	public void updateConsole(String text){
 		console.log(text);
 	}
-	
 	public void updateConsole(String text, int messageTyp){
 		console.log(text, messageTyp);
 	}
@@ -571,10 +467,7 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		}
 	}
 	
-	public void invalidateInputFields(){
-		tfTg.invalidateField();
-		tfTu.invalidateField();
-	}
+	// ---------- Plot Methods ----------
 	
 	public void addPlot(Regelkreis regelkreis){
 		int index = plotManager.addPlot(regelkreis);
@@ -588,6 +481,7 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		plotManager.updateSelectedPlot(regelkreis);
 	}
 	
+	// ---------- Getters ----------
 	
 	public int getState(){
 		return state;
@@ -601,6 +495,12 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		paramValues[3] = Double.parseDouble(tfTp.getText());
 		
 		return paramValues;
+	}
+	
+	// ---------- Setters ----------
+	
+	public void setActionHandler(Controller actionHandler){
+		this.actionHandler = actionHandler;
 	}
 	
 	public void setState(int newState){
@@ -663,23 +563,109 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 				break;
 		}
 	}
-
-
-
-	@Override
-	public void focusGained(FocusEvent e) {
-		// TODO Auto-generated method stub
-		}
-
-
+	
+	// ---------- Listener Methods ----------
 
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		if (!purging){
 			plotManager.valueChanged(e);
+			if (plotManager.getSelectedPlot().regelkreis.getTyp() == Model.piRegler){
+				tfTv.setText("-");
+				tfTp.setText("-");
+				setState(View.modifyPIState);
+			} else {
+				setState(View.modifyPIDState);
+			}
 			actionHandler.updateParamValues(plotManager.getSelectedPlot().regelkreis.getResult().getParamArray());
 			updateOptiSlider(plotManager.getSelectedPlot().regelkreis.getKkfRaw());
 		}
+	}
+	
+	/**
+	 * Wird bei einem ActionEvent ausgeführt
+	 */
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Object eventSource = e.getSource();
+		if (eventSource == btBerechnen){
+			actionHandler.berechnenPressed(tfTu.getValue(), tfTg.getValue(), tfk.getValue(), btPID.isSelected(), btPI.isSelected(), tfOver.getValue());
+		} else if(eventSource==tfKr||eventSource==tfTn||eventSource==tfTv||eventSource==tfTp){
+			double[] eingabe=new double[4];
+			eingabe[0]=Double.parseDouble(tfKr.getText());
+			eingabe[1]=Double.parseDouble(tfTn.getText());
+			eingabe[2]=Double.parseDouble(tfTv.getText());
+			eingabe[3]=Double.parseDouble(tfTp.getText());
+			int selectedIndex = plotManager.getSelectedIndex();
+			actionHandler.tfValuesChanged(eingabe, selectedIndex);
+			stepResponseTable.setRowSelectionInterval(selectedIndex, selectedIndex);
+			
+		} else if(eventSource==btSipmle)
+		{
+			remove(panel3);
+			add(panel3Simple, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
+					GridBagConstraints.SOUTH, GridBagConstraints.BOTH, new Insets(
+							0, 0, 0, 2), 0, 0));
+			updateUI();		
+			
+		} else if(eventSource==btExpert)
+		{
+			remove(panel3Simple);
+			add(panel3, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
+					GridBagConstraints.SOUTH, GridBagConstraints.BOTH, new Insets(
+							0, 0, 0, 2), 0, 0));
+			updateUI();		
+		} else if (eventSource == btDelete){
+			actionHandler.deleteRegelkreis(plotManager.getSelectedIndex());
+			int index = plotManager.removeSelectedPlot();
+			if (index >= 0){
+				stepResponseTable.setRowSelectionInterval(index, index);
+			}
+		} else if (eventSource == btDelAll){
+			purging = true;
+			plotManager.removeAllPlots();
+			actionHandler.deleteAllRegelkreise();
+			setState(View.initState);
+			btDelete.setEnabled(false);
+			btDelAll.setEnabled(false);
+			purging = false;
+		}
+	}
+	
+	public void stateChanged(ChangeEvent e){
+		JSlider eventSource = (JSlider)e.getSource();
+		int index = plotManager.getSelectedIndex();
+		if (eventSource == sliderKr){			
+			actionHandler.paramUpdated(sliderKr.getValue(), "kr", index);
+		} else if (eventSource == sliderTn) {
+			actionHandler.paramUpdated(sliderTn.getValue(), "tn", index);
+		} else if (eventSource == sliderTv) {
+			actionHandler.paramUpdated(sliderTv.getValue(), "tv", index);
+		} else if (eventSource == sliderTp) {
+			actionHandler.paramUpdated(sliderTp.getValue(), "tp", index);
+		}else if(eventSource == sliderOpt){
+			int selectedIndex = plotManager.getSelectedIndex();
+			actionHandler.optiSliderUpdated(sliderOpt.getValue(), selectedIndex);
+			stepResponseTable.setRowSelectionInterval(selectedIndex, selectedIndex);
+		}
+		if (eventSource.getValue() == eventSource.getMaximum() && eventSource != sliderOpt){
+			updateConsole("Grössere Werte sind mit Texteingabe möglich.");
+		}
+	}
+	
+	public void focusLost(FocusEvent e) {
+		double[] eingabe=new double[4];
+		eingabe[0]=Double.parseDouble(tfKr.getText());
+		eingabe[1]=Double.parseDouble(tfTn.getText());
+		eingabe[2]=Double.parseDouble(tfTv.getText());
+		eingabe[3]=Double.parseDouble(tfTp.getText());
+		actionHandler.tfValuesChanged(eingabe, plotManager.getSelectedIndex());
+	}
+
+	@Override
+	public void focusGained(FocusEvent e) {
+		// Not used but required by interface
+		
 	}
 
 }

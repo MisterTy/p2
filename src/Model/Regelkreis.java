@@ -1,7 +1,5 @@
 package Model;
 
-import java.util.Arrays;
-
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.util.FastMath;
 
@@ -10,6 +8,14 @@ import Auxillary.MathLibrary;
 
 /**
  * 
+ * 
+ * @param type Regler Typ
+ * @param strecke 
+ * @param kreisFrequenzSpektrum 
+ * @param gewunschtesUberschwingen
+ * @param verstarkungStrecke
+ * @param zeitkonstante
+ * @param kkfOffset
  */
 public class Regelkreis {
 	private GenericRegler regler;
@@ -26,14 +32,6 @@ public class Regelkreis {
 
     /**
      * 
-     * 
-     * @param type Regler Typ
-     * @param strecke 
-     * @param kreisFrequenzSpektrum 
-     * @param gewunschtesUberschwingen
-     * @param verstarkungStrecke
-     * @param zeitkonstante
-     * @param kkfOffset
      */
     public Regelkreis(int type, Strecke strecke, double[] kreisFrequenzSpektrum, double gewunschtesUberschwingen,
     		double verstarkungStrecke, double[] zeitkonstante, double kkfOffset){
@@ -58,7 +56,7 @@ public class Regelkreis {
     	}
     	double addFactor = phasenrand / 2;
     	
-    	while (FastMath.abs(overshoot-oldOvershoot) > precision && counter < 100){
+    	while ((FastMath.abs(overshoot-oldOvershoot) > precision || overshoot < 0) && counter < 100){
     		oldOvershoot = overshoot;
     		dimensionieren(type, utfStrecke, kreisFrequenzSpektrum, phasenrand, verstarkungStrecke, zeitkonstante, kkfOffset, counter==0);
         	overshoot = calcOvershoot();
@@ -70,7 +68,7 @@ public class Regelkreis {
         		}
         		phasenrand += addFactor;
         		grMerker = true;
-        	} else if (overshoot < wantedOvershoot){
+        	} else if (overshoot < wantedOvershoot || overshoot < 0){
         		if (grMerker){
         			addFactor /= 2;
         			grMerker = false;
@@ -108,7 +106,6 @@ public class Regelkreis {
     private double calcOvershoot() {
     	double[] yValues = getYValues();
     	double maximum = MathLibrary.findMax(yValues);
-    	double endwert = 1;//yValues[yValues.length-1];
     	overshoot = (maximum-1)*100;
     	return overshoot;
     }
@@ -155,12 +152,6 @@ public class Regelkreis {
     }
     
     public double getOvershoot(){
-    	if(overshoot<0) overshoot=0;
     	return overshoot;
-    }
-    
-    
-    public void output(){
-    	System.out.println("Regler Typ: "+regler.reglerTyp+" Resultat: "+Arrays.toString(regler.getResult().getParamArray()));
     }
 }

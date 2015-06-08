@@ -5,7 +5,6 @@ import javax.swing.table.AbstractTableModel;
 
 import Auxillary.MathLibrary;
 import Model.Model;
-import View.View;
 
 public class TableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 1L;
@@ -172,7 +171,7 @@ public class TableModel extends AbstractTableModel {
 			if (heading){
 				return "Ü'schwingen erreicht";
 			}
-			if(selectedPlot.regelkreis.getOvershoot()==0){
+			if(selectedPlot.regelkreis.getOvershoot() <= 0){
 				return "Aperiodisch";
 			}else{
 				return MathLibrary.scientificFormat(selectedPlot.regelkreis.getOvershoot())+"%";

@@ -1,7 +1,5 @@
 package Model;
 
-import java.util.*;
-
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.util.FastMath;
 
@@ -11,8 +9,7 @@ import Auxillary.MathLibrary;
  * Diese Klasse berechnet die Parameter eines PI-Reglers nach dem Zellwegerverfahren.
  * Diese Dimensionierung erfolgt aufgrund einer Regelstrecke, deren Übertragungsfunktion
  * (Verstärkung und Zeitkonstanten)bekannt ist.
- *                 
- *
+ * 
  */
 public class PIRegler extends GenericRegler {
 	
@@ -33,9 +30,15 @@ public class PIRegler extends GenericRegler {
 	private Complex g_str_wd;
 	private Complex gOffwd;
 
-/**
- * Konstruktor der PI Reglers
- */
+  /**
+   * Konstruktor des PI Reglers
+   * 
+   * @param gs
+   * @param w
+   * @param phir
+   * @param kS
+   * @param t
+   */
     public PIRegler() {
     	
     	tv=-1;
@@ -59,7 +62,7 @@ public class PIRegler extends GenericRegler {
     	tn=1/wpi;
    	
        	for (int i = 0; i < w.length; i++) {
-			grp[i]=(Complex.I.multiply(w[i]).multiply(tn)).reciprocal().add(1); 
+			grp[i]=(Complex.I.multiply(w[i]).multiply(tn)).reciprocal().add(1); //Übertragungsfkt PI Regeler mit kR=1
 		}
  	}
     
@@ -89,9 +92,8 @@ public class PIRegler extends GenericRegler {
     	gOffwd=grp_wd.multiply(g_str_wd);
     }
    
-
     /**
-     * Fuehrt die Berechnung des PI Reglers durch
+     * Führt die Berechnung des PI Reglers durch
      */
     public void compute(){
     	

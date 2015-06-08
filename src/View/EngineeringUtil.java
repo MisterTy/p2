@@ -12,10 +12,10 @@ import java.util.Locale;
  */
 public class EngineeringUtil {
 	private final static int PREFIX_OFFSET = 5;
-	private final static String[] PREFIX_ARRAY = { "f", "p", "n", "�", "m", "",
+	private final static String[] PREFIX_ARRAY = { "f", "p", "n", "µ", "m", "",
 			"k", "M", "G", "T" };
 
-	private final static char[] PREFIX_TEST_ARRAY = { 'f', 'p', 'n', 'u', '�',
+	private final static char[] PREFIX_TEST_ARRAY = { 'f', 'p', 'n', 'u', 'µ',
 			'm', 'k', 'K', 'M', 'G', 'T' };
 
 	private final static int[] PREFIX_EXP_ARRAY = { -15, -12, -9, -6, -6, -3,

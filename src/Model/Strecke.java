@@ -13,11 +13,11 @@ public class Strecke {
 	private int n;
 	private Complex[] utfStrecke;
 
-    /**
-     * 
-     * @param tu
-     * @param tg
-     */
+	/**
+	 * 
+	 * @param tu
+	 * @param tg
+	 */
     public Strecke(double tu, double tg) {
     	this.tu = tu;
     	this.tg = tg;

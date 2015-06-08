@@ -1,6 +1,5 @@
 package Model;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Observable;
 
 import org.apache.commons.math3.complex.Complex;
@@ -25,9 +24,7 @@ public class Model extends Observable {
 	double[] zeitkonstante;
 	int anzahlPunkte;
 	
-    /**
-     * 
-     */
+
     public Model() {
     	
     }
@@ -35,6 +32,7 @@ public class Model extends Observable {
     public void setAnzahlPunkte(int anzahl){
     	this.anzahlPunkte = anzahl;
     }
+    
     /**
      * Berechnet die Strecke und deren Uebertragungsfunktion
      * @param tu Tu
@@ -99,6 +97,7 @@ public class Model extends Observable {
     	setChanged();
     	notifyObservers(note);
     }
+    
     /**
      * Updatet die Schrittantwort und Berechnet sie neu
      * @param regelkreis Regelkreis
@@ -114,7 +113,7 @@ public class Model extends Observable {
     }
     
     /**
-     * Ueberprüft obe Werte geändert wurde und eine neuberechnung notwendig ist.
+     * Ueberprüft ob eine Neuberechnung notwendig ist.
      * @param regelkreis 
      * @param kkfRaw
      * @return
@@ -126,6 +125,7 @@ public class Model extends Observable {
     		return false;
     	}
     }
+    
     /**
      * Loescht den übergebenen Regelkreis.
      * @param regelkreis Regelkreis
@@ -147,12 +147,6 @@ public class Model extends Observable {
      */
     public int getAnzRegelkreise(){
     	return regelKreisListe.size();
-    }
-    
-    public void output(){
-    	for (Regelkreis regelkreis : regelKreisListe){
-    		regelkreis.output();
-    	}
     }
     
     public double[] getXValues(){
