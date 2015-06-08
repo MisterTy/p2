@@ -35,7 +35,11 @@ public class Model extends Observable {
     public void setAnzahlPunkte(int anzahl){
     	this.anzahlPunkte = anzahl;
     }
-    
+    /**
+     * Berechnet die Strecke und deren Uebertragungsfunktion
+     * @param tu Tu
+     * @param tg Tg
+     */
     public void setStrecke(double tu, double tg){
     	strecke = new Strecke(tu, tg);
     	zeitkonstante = strecke.getCoeffitients();
@@ -57,6 +61,10 @@ public class Model extends Observable {
     	this.verstarkungStrecke = verstarkung;
     }
     
+    /**
+     * Erstellt einen neuen Regelkreis
+     * @param type Regler-Typ
+     */
     public void addRegelkreis(int type){
     	switch (type){
     		case piRegler: case pidRegler:
@@ -71,6 +79,11 @@ public class Model extends Observable {
     	}
     }
     
+    /**
+     * Aendert den ausgewaehlten Regelkreis
+     * @param kkfOffset
+     * @param regelkreisIndex
+     */
     public void updateRegelkreis(double kkfOffset, int regelkreisIndex){
     	int n = strecke.getN();
     	double modifier = n / 25.0;
@@ -86,7 +99,11 @@ public class Model extends Observable {
     	setChanged();
     	notifyObservers(note);
     }
-    
+    /**
+     * Updatet die Schrittantwort und Berechnet sie neu
+     * @param regelkreis Regelkreis
+     * @param params Parameterliste
+     */
     public void updateStepResponse(int regelkreis, double[] params){
     	regelKreisListe.get(regelkreis).updateStepResponse(params, verstarkungStrecke, zeitkonstante, kreisFrequenzSpektrum);
     	Notification note = new Notification(Notification.updatedStepResponse);
@@ -96,6 +113,12 @@ public class Model extends Observable {
     	notifyObservers(note);
     }
     
+    /**
+     * Ueberprüft obe Werte geändert wurde und eine neuberechnung notwendig ist.
+     * @param regelkreis 
+     * @param kkfRaw
+     * @return
+     */
     public boolean updateNecessary(int regelkreis, double kkfRaw){
     	if (regelKreisListe.get(regelkreis).getKkfRaw() != kkfRaw){
     		return true;
@@ -103,16 +126,25 @@ public class Model extends Observable {
     		return false;
     	}
     }
-    
+    /**
+     * Loescht den übergebenen Regelkreis.
+     * @param regelkreis Regelkreis
+     */
     public void removeRegelkreis(int regelkreis){
     	regelKreisListe.remove(regelkreis);
     }
     
+    /**
+     * Löscht alle Regelkreise
+     */
     public void deleteAllRegelkreise(){
     	regelKreisListe.clear();
     	strecke = null;
     }
     
+    /**
+     * Gibt die Anzahl der Regelkreise zurueck
+     */
     public int getAnzRegelkreise(){
     	return regelKreisListe.size();
     }

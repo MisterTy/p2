@@ -7,7 +7,9 @@ import org.apache.commons.math3.complex.Complex;
 import Auxillary.DimensioningResult;
 
 /**
- * 
+ * Diese Klasse enthält das Grundgerüst für den PI und PID Regler 
+ *
+ *
  */
 public class GenericRegler {
 	public int reglerTyp = 0;
@@ -34,7 +36,12 @@ public class GenericRegler {
     	
     }
     
-    
+    /**
+     * Entfernt den Sprung um 2 Pi bei einer stetig fallenden funktion
+     * 
+     * @param liste Array mit einer Funktion mit Sprung
+     * @return Funktion ohne Sprung
+     */
     public double[] sprungEntfernen(double[] liste){
        	for (int y = 0; y < liste.length; y++) {
     		if(liste[y]>0){
@@ -46,6 +53,16 @@ public class GenericRegler {
     	
     }
 
+    /**
+     * Werte zur berechnung der Regler uebergeben
+     * 
+     * @param utfStrecke Uebertragungsfunktion der Strecke
+     * @param kreisFrequenzSpektrum 
+     * @param phasenrand
+     * @param verstarkungStrecke
+     * @param zeitkonstante
+     * @param knickKreisFrequenz
+     */
     public void setValues(Complex[] utfStrecke, double[] kreisFrequenzSpektrum,
     		double phasenrand, double verstarkungStrecke, double[] zeitkonstante,
     		double knickKreisFrequenz) {

@@ -2,6 +2,8 @@ package Model;
 
 import java.util.*;
 
+
+//TODO: Klasse entfernen
 /**
  * 
  */

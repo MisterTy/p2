@@ -26,6 +26,14 @@ public class Regelkreis {
 
     /**
      * 
+     * 
+     * @param type Regler Typ
+     * @param strecke 
+     * @param kreisFrequenzSpektrum 
+     * @param gewunschtesUberschwingen
+     * @param verstarkungStrecke
+     * @param zeitkonstante
+     * @param kkfOffset
      */
     public Regelkreis(int type, Strecke strecke, double[] kreisFrequenzSpektrum, double gewunschtesUberschwingen,
     		double verstarkungStrecke, double[] zeitkonstante, double kkfOffset){

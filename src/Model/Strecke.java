@@ -15,6 +15,8 @@ public class Strecke {
 
     /**
      * 
+     * @param tu
+     * @param tg
      */
     public Strecke(double tu, double tg) {
     	this.tu = tu;
@@ -25,6 +27,12 @@ public class Strecke {
     	n = saniCalculator.getN();
     }
     
+    /**
+     * Berechnung der Uebertragungsfunktion der Strecke
+     * @param anzahlPunkte
+     * @param w Frequenzenliste
+     * @param ks 
+     */
     public void calculateUtf(int anzahlPunkte, double[] w, double ks){
     	utfStrecke = new Complex[anzahlPunkte];
 		

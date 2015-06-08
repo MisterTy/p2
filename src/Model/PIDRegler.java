@@ -5,7 +5,9 @@ import org.apache.commons.math3.complex.Complex;
 import Auxillary.MathLibrary;
 
 /**
- * 
+ * Diese Klasse berechnet die Parameter eines PID-Reglers nach dem Zellwegerverfahren.
+ * Diese Dimensionierung erfolgt aufgrund einer Regelstrecke, deren Übertragungsfunktion
+ * (Verstärkung und Zeitkonstanten)bekannt ist.
  */
 public class PIDRegler extends GenericRegler {
 

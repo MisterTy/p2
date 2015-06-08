@@ -6,6 +6,10 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JTextField;
 
+/**
+ * Ueberarbeitetes Textfeld mit Farbverwaltung
+ * 
+ */
 public class Console extends JTextField {
 	private static final long serialVersionUID = 1L;
 	

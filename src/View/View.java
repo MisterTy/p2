@@ -175,18 +175,7 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		tfk.setMaxValue(100);
 		tfk.setMinValue(0);
 		tfk.setEmptyAllowed(false);
-		
 	
-
-		
-		/*
-		 *
-		 *
-		 * x, y, x-span, y-span, x-weight, y-weight, anchor, fill, insets(int
-		 * top, int left, int bottom, int right), internal padding x, internal
-		 * padding y.
-		 * 
-		 */
 	
 //*****************************************************************************		
 		
@@ -411,11 +400,6 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		panel4.setLayout(new GridBagLayout());
 		panel4.add(chartPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
-//		panel4.add(panelLegende, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
-//				GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));
-		
-//==> Legende
-		
 		panel4.add(console, new GridBagConstraints(0, 2, 1, 1, 1.0, 0.0,
 				GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		
@@ -447,7 +431,10 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 
 
 
-	@Override
+	/**
+	 * Wird bei einem ActionEvent ausgeführt
+	 * Action listener wurden be allen Buttons und 
+	 */
 	public void actionPerformed(ActionEvent e) {
 		Object eventSource = e.getSource();
 		if (eventSource == btBerechnen){
@@ -559,6 +546,10 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 		}
 	}
 	
+	/**
+	 * Maximalwerte der Slider aktualisieren
+	 * @param MaxValues Maximalwerte
+	 */
 	public void updateSliderMaxValues(double[] MaxValues){
 		sliderKr.setMaximum((int)(MaxValues[0]*2000.0));
 		sliderTn.setMaximum((int)(MaxValues[1]*2000.0));
@@ -569,6 +560,7 @@ public class View extends JPanel implements ActionListener, ChangeListener, Focu
 	public void updateConsole(String text){
 		console.log(text);
 	}
+	
 	public void updateConsole(String text, int messageTyp){
 		console.log(text, messageTyp);
 	}
